@@ -1,0 +1,157 @@
+body {
+
+	font-family: "Helvetica";
+	
+}
+
+.bienvenida {
+
+	font-family: 'Helvetica'; 
+	font-size: 24px; 
+	margin-top: -25px;
+
+}
+
+.filalinks {
+
+	font-family: 'Helvetica'; 
+	font-size: 14px;
+
+}
+
+form {
+
+	width: 30%;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-family: "Helvetica";
+	font-size: 24px;
+	overflow: hidden;
+	
+}
+
+input[type=submit] {
+
+	border: 2px solid #142c3c;
+	padding: 5px;
+	border-radius: 5px;
+	width: 100%;
+	text-align: center;
+	background-color: #CCE8ED;
+	font-family: "Helvetica";
+	font-size: 22px;
+
+}
+
+input[type=submit]:hover {
+
+	border: 2px solid black;
+	padding: 5px;
+	border-radius: 5px;
+	width: 100%;
+	text-align: center;
+	background-color: #B2E7F0;
+	font-family: "Helvetica";
+	font-size: 22px;
+	-webkit-transition: background-color 100ms linear;
+	-moz-transition: background-color 100ms linear;
+	-o-transition: background-color 100ms linear;
+	-ms-transition: background-color 100ms linear;
+	transition: background-color 100ms linear;
+	cursor: pointer;
+
+}
+
+button.seclectorTiempo {
+
+	width: 50px;
+	height: 50px;
+	background-color: rgb(204 232 237);
+	border-color: #396b84;
+	border-radius: 12px;
+	outline: none;
+}
+
+.contenerdorExpiracion {
+
+	text-align: center;
+	font-size: 22px;
+	margin-bottom: 10px;
+}
+
+form#dropzoneSubida {
+
+	width: 650px;
+	border: 2px solid #396B84;
+	border-radius: 4px;
+	background-color: #CCE8ED;
+	cursor: pointer;
+	padding-bottom: 25px;
+
+}
+
+button.botonSubida {
+
+	color: #28538F;
+	cursor: pointer;
+	font-size: 24px;
+	font-weight: 400;
+	margin-top: 30px;
+	background: none;
+	border: none;
+
+}
+
+a.botonlink {
+
+	color: #3F8694;
+	text-decoration: none;
+
+}
+
+a.botonlink:hover {
+
+	color: #3F8694;
+	text-decoration: underline;
+
+}
+
+.dz-remove {
+	background-color:#3F8694;
+	color: #fff;
+	text-decoration:none;
+}
+
+@media screen and (max-device-width: 640px) {
+
+	button.seclectorTiempo {
+	
+		width: 50px;
+		height: 50px;
+		background-color: rgb(204 232 237);
+		border-color: #396b84;
+		border-radius: 12px;
+		outline: none;
+
+	}
+
+	.bienvenida {
+
+		width: 85%;
+		font-size: 38px;
+
+	}
+
+	.filalinks {
+		
+		margin-top: 55px;
+		font-size: 30px;
+
+	}
+
+}
+
+
+
+

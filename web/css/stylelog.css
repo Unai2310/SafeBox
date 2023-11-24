@@ -1,0 +1,200 @@
+
+body {
+
+	background-image: url("/bgs/texture3.png");
+	font-family: "Helvetica";
+}
+
+.bienvenida {
+
+	color: #3F8694;
+	text-align: center;
+	font-size: 64px;
+	padding: 5px;
+	
+}
+
+.botonInicio {
+
+	width: 10%;
+	height: 22px;
+	padding: 2px;
+	border: 2px solid #3F8694;
+	border-radius: 15px;
+	text-align: center;
+	position: absolute;
+	font-size: 18px;
+
+}
+
+.botonInicio:nth-of-type(2) {
+
+	top: 46px;
+
+}
+
+
+form.genericform {
+
+	width: 70%;
+	padding: 35px;
+	border: 2px solid #3F8694;
+	border-radius: 25px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 16px;
+	overflow: hidden;
+	
+}
+
+form a {
+
+	color: #3F8694;
+	text-decoration: none;
+
+}
+
+input[type=text] { 
+
+	width: 45%;
+	height: 25px;
+	font-size: 16px;
+
+}
+
+input[type=text] { 
+
+	width: 45%;
+	height: 25px;
+	font-size: 16px;
+
+}
+
+input[type=text].pwd {
+	background-color: #CCE8ED;
+	border: 2px solid #142c3c;
+	width: 35%;
+	height: 25px;
+	font-size: 18px;
+}
+
+input[type=text].stylized { 
+
+	background-color: #CCE8ED;
+	border: 2px solid #142c3c;
+
+}
+
+input[type=text]:focus { 
+
+	outline: 0;
+
+}
+
+input[type=password] { 
+
+	background-color: #CCE8ED;
+	border: 2px solid #142c3c;
+	width: 35%;
+	height: 25px;
+	font-size: 18px;
+}
+
+input[type=submit] {
+
+	border: 2px solid #142c3c;
+	padding: 5px;
+	border-radius: 5px;
+	width: 100%;
+	text-align: center;
+	background-color: #CCE8ED;
+	font-size: 22px;
+	cursor: pointer;
+
+}
+
+input[type=submit]:hover {
+
+	background-color: #B2E7F0;
+	transition: background-color 150ms linear;
+
+}
+
+input[type=button] {
+    padding: 2px;
+    right: 5px;
+    top: 5px;
+}
+
+a.botonHome {
+
+	color: black;
+	text-decoration: none;
+
+}
+
+a.botonHome:hover {
+
+	color: black;
+	text-decoration: underline;
+
+}
+
+a.botonlink {
+
+	color: #3F8694;
+	text-decoration: none;
+
+}
+
+a.botonlink:hover {
+
+	color: #3F8694;
+	text-decoration: underline;
+
+}
+
+
+
+
+
+
+@media screen and (max-device-width: 640px) {
+
+	.bienvenida {
+
+		width: 85%;
+		font-size: 38px;
+
+	}
+
+	form.genericform {
+
+		width: 85%;
+		margin-bottom: 290px;
+
+	}
+
+	.botonInicio {
+
+		width: 20%;
+		height: auto;
+	}
+
+	.botonInicio:nth-of-type(2) {
+
+		top: 54px;
+		color: red;
+	}
+	
+	a.botonHome{
+
+		font-size: 24px;
+
+	}
+}
+
+
+
+
