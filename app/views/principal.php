@@ -58,6 +58,7 @@
 		<center>
 			<div class="filalinks"> 
 				<a href="?orden=login" class="botonlink">Login</a> | 
+				<a href="?orden=registrar" class="botonlink">Resgistrar</a> | 
 				<a href="" class="botonlink">Informacion</a>  | 
 				<a href="#" class="botonlink" id="changeTheme">Modo oscuro</a>
 			</div>

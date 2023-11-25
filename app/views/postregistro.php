@@ -15,7 +15,7 @@
 		</div>
 
 		<header>
-			<div class="bienvenida">Inicio de Sesión</div>
+			<div class="bienvenida">Bienvenido</div>
 		</header>
 
 		<br>
@@ -23,23 +23,11 @@
 		<br>
 
 		<form class="genericform" action="dologin.php" method="post" enctype="multipart/form-data">
-			Usuario: 
-			<br> 
-			<input class="stylized" type="text" name="username" required=""> 
-			<br> 
-			<br>
-			Contraseña: 
-			<br> 
-			<input class="stylized" type="password" name="password" required=""> 
-			<br> 
-			<br>
-			<br>
-			<input type="submit" value="Login" name="submit">
-			<br>
-			<br>
-			<div style="font-size: 16px; font-family: 'Helvetica';">No tienes cuenta? <a class="botonlink" href="?orden=registrar"> Registrate </a>
-				<br> 
-				<a class="botonlink" href="">Olvidaste tu contraseña?</a>
+			<div style="font-size: 20px; font-family: 'Helvetica';">
+                Muchas gracias por unirte a <strong>Safebox</strong>. <br>
+                Solo te queda verificar la direccion de correo electronico para poder activar tu cuenta. <br>
+                Hemos enviado a <?= isset($eml)?$eml:'' ?> un correo con la activación de la cuenta. <br>
+                Completalo para poder <a href="?orden=login" class="botonlink">Iniciar Sesión</a>.
 			</div>
 		</form>
 	</body>

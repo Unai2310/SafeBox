@@ -22,18 +22,20 @@
     <br>
     <br>
 
-    <form class="genericform" action="doregister.php" method="post" enctype="multipart/form-data" autocomplete="off">
-        Usuario: <br> <input class="stylized" type="text" name="username" required> <br><small><b>No puede ser el mismo que tu email.</b></small> <br>
-        E-Mail: <br> <input class="stylized" type="text" name="email" style="width: 50%;" required> <br> <br>
+    <form class="genericform" action="/safebox/" method="POST" autocomplete="off">
+
+        Nombre: <br> <input class="stylized" type="text" name="name" value="<?= isset($nom)?$nom:'' ?>" required> <?= isset($msgnom)?$msgnom:'' ?> <br> <br>
+        Usuario: <br> <input class="stylized" type="text" name="username" value="<?= isset($usr)?$usr:'' ?>"  required> <?= isset($msgusr)?$msgusr:'' ?> <br> <br>
+        E-Mail: <br> <input class="stylized" type="text" name="email" style="width: 50%;" value="<?= isset($eml)?$eml:'' ?>" required> <?= isset($msgeml)?$msgeml:'' ?> <br> <br>
         Contraseña: <br> 
-            <input id="txtPwd" class="pwd" type="password" name="password" required> 
+            <input id="txtPwd" type="password" name="password" class="pwd" required> 
             <input id="mostrarPwd" type="button" value="👁️" onclick="mostrarContrasena()"/>
         <br> <br>
-        Confirmar Contraseña: <br> <input id="reTxtPwd" class="pwd" type="password" name="password" required> <br> <br>
+        Confirmar Contraseña: <br> <input id="reTxtPwd" type="password" name="reTxtPwd" class="pwd" required> <?= isset($msgpwd)?$msgpwd:'' ?> <br> <br>
         <br>
-        <input type="submit" value="Register" name="submit">
+        <input type="submit" value="Registrar" name="orden">
         <br> <br>
-            Ya tienes una cuenta en SafeBox?. Puedes iniciar sesión <a href="?orden=login" class="botonlink">aqui mismo</a>
+            Ya tienes una cuenta en SafeBox? Puedes iniciar sesión <a href="?orden=login" class="botonlink">aqui mismo</a>
         <br>
     </form>
     
