@@ -54,11 +54,111 @@ class AccesoDatos {
         $resu = ($this->dbh->affected_rows == 1);
         return $resu;
     }
+
+    public function getId ($correo) {
+        $id = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT id FROM usuarios WHERE email LIKE ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$correo);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $id = $result->fetch_row();
+        }
+
+        return $id;
+    }
+
+    public function validaToken($id, $token) {
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT id FROM usuarios WHERE id = ? AND token LIKE ? LIMIT 1");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+  
+        $stmt_usuario->bind_param("is",$id, $token);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $user = $result->fetch_row();
+        }
+        if (isset($user)) {
+            if ($this->activarUsuario($id)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     
+    function activarUsuario ($id) {
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET active = 1 WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("i", $id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
+    public function getToken($id) {
+        $token = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT token FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $token = $result->fetch_row();
+        }
+
+        return $token[0];
+    }
+
+    public function getEmail($id) {
+        $email = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT email FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $email = $result->fetch_row();
+        }
+
+        return $email[0];
+    }
+
+    public function isActivo($id) {
+        $valid = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT active FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $valid = $result->fetch_row();
+        }
+
+        if ($valid[0] == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function existeUser (String $username) {
         $user = false;
         
-        $stmt_usuario = $this->dbh->prepare("select * from usuarios where username =?");
+        $stmt_usuario = $this->dbh->prepare("SELECT * FROM usuarios WHERE username =?");
         if ( $stmt_usuario == false) die ($this->dbh->error);
   
         $stmt_usuario->bind_param("s",$username);

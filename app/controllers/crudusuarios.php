@@ -38,3 +38,32 @@ function crudPostRegistro(){
         include_once "app/views/postregistro.php";
     }
 }
+
+function crudvalidarUsuario() {
+    if (isset($_GET["id"]) && isset($_GET["token"])) {
+        $db = AccesoDatos::getModelo();
+        if ($db->isActivo($_GET["id"])) {
+            $msg = "Esta cuenta ya esta verificada en <strong>SafeBox</strong>. <br>
+            Ya puedes <a href=\"?orden=login\" class=\"botonlink\">Iniciar Sesión</a>. 
+            O empezar a subir archivos en <a href=\"/\" class=\"botonlink\">SafeBox</a>";
+            include_once "app/views/postvalidacion.php";
+        } else if ($db->validaToken($_GET["id"], $_GET["token"])) {
+            $msg = "Se ha verificado la cuenta en <strong>SafeBox</strong>. <br>
+            Ya puedes <a href=\"?orden=login\" class=\"botonlink\">Iniciar Sesión</a>. 
+            O empezar a subir archivos en <a href=\"/\" class=\"botonlink\">SafeBox</a>";
+            include_once "app/views/postvalidacion.php";
+        } else {
+            $msg = "Ha fallado la verificacion de la cuenta en <strong>SafeBox</strong>. <br>
+            <a href=\"?orden=revalidacion&id=".$_GET["id"]."&token=".$_GET["token"]."\" class=\"botonlink\">Pulsa aqui</a> para reenviar el correo y probar de nuevo. <br>
+            O a sube archivos de forma temporal en <a href=\"/\" class=\"botonlink\">SafeBox</a>";
+            include_once "app/views/postvalidacion.php";
+        } 
+    }
+}
+
+function crudrevalidarUsuario() {
+    $db = AccesoDatos::getModelo();
+    $eml = $db->getEmail($_GET["id"]);
+    enviarCorreo($eml, $db->getToken($_GET["id"]));
+    include_once "app/views/postregistro.php";
+}

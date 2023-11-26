@@ -12,6 +12,8 @@ if (isset($_GET["orden"])) {
     switch ($_GET['orden']) {
         case "login" : require_once "app/views/login.php"; break;
         case "registrar" : require_once "app/views/registro.php"; break;
+        case "validar" : crudvalidarUsuario(); break;
+        case "revalidacion" : crudrevalidarUsuario(); break;
     }
 } else  if (isset($_POST["orden"])){
     switch ($_POST['orden']) {

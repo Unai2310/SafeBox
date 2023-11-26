@@ -6,6 +6,7 @@ require_once __DIR__."/../composer/vendor/autoload.php";
 
 function enviarCorreo($correo, $token) {
     $mail = new PHPMailer(true);
+    $db = AccesoDatos::getModelo();
 
     try {
         //Server settings
@@ -20,12 +21,12 @@ function enviarCorreo($correo, $token) {
 
         //Recipients
         $mail->setFrom('safebox074@gmail.com', 'Equipo de Safebox');
-        $mail->addAddress($correo, 'Mailer');    
+        $mail->addAddress($correo, 'SafeBox');    
 
         //Content
         $mail->isHTML(true);                                  
         $mail->Subject = 'Bienvenido a SafeBox';
-        $mail->Body = getHtmlBody($token);
+        $mail->Body = getHtmlBody($db->getId($correo), $token);
 
         $mail->send();
     } catch (Exception $e) {
@@ -37,8 +38,8 @@ function generarToken() {
     return bin2hex(openssl_random_pseudo_bytes(32));
 }
 
-function getHtmlBody($token) {
+function getHtmlBody($id, $token) {
     $html = file_get_contents("app/views/bodycorreo.html");
     $partes = explode("&",$html);
-    return $partes[0]."href=\"http://flo.no-ip.info/safebox/?orden=validar&token=".$token."\"".$partes[1];
+    return $partes[0]."href=\"http://flo.no-ip.info/safebox/?orden=validar&id=".$id[0]."&token=".$token."\"".$partes[1];
 }
