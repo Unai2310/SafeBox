@@ -8,6 +8,7 @@ class Usuario {
     private $pwd;
     private $active;
     private $twoPhase;
+    private $token;
     
 
     

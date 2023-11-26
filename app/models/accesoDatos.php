@@ -45,12 +45,11 @@ class AccesoDatos {
     public function addUsuario($user):bool{
 
         $stmt_creauser  = $this->dbh->prepare(
-            "INSERT INTO `usuarios`  (`name`, `username`, `email`, `pwd`, `active`, `twoPhase`)".
-            "Values(?,?,?,?,?,?)");
+            "INSERT INTO `usuarios`  (`name`, `username`, `email`, `pwd`, `active`, `twoPhase`, `token`)".
+            "Values(?,?,?,?,?,?,?)");
         if ( $stmt_creauser == false) die ($this->dbh->error);
 
-        $stmt_creauser->bind_param("ssssss",$user->name,$user->username,$user->email,
-        $user->pwd,$user->active,$user->twoPhase);
+        $stmt_creauser->bind_param("ssssiis",$user->name,$user->username,$user->email,$user->pwd,$user->active,$user->twoPhase,$user->token);
         $stmt_creauser->execute();
         $resu = ($this->dbh->affected_rows == 1);
         return $resu;

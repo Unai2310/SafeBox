@@ -1,4 +1,6 @@
 <?php
+
+require_once ('funciones.php');
 function crudPostRegistro(){
     limpiarArrayEntrada($_POST);
     $us = new usuario();
@@ -8,6 +10,7 @@ function crudPostRegistro(){
     $us->pwd = sha1($_POST["password"]);
     $us->active = 0;
     $us->twoPhase = 0;
+    $us->token = generarToken();
     $db = AccesoDatos::getModelo();
     if ($us->name == "" || $us->username == "" || $us->email == ""|| $us->pwd == "" || $_POST["reTxtPwd"] == "") {
         $msgnom = "<br><small><b>Hay algun campo vacio, por favor rellenalos todos para poder continuar.</b></small>";
@@ -31,6 +34,7 @@ function crudPostRegistro(){
     } else {
         $db->addUsuario($us);
         $eml = $us->email;
+        enviarCorreo($eml, $us->token);
         include_once "app/views/postregistro.php";
     }
 }
