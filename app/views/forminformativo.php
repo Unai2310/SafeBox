@@ -22,7 +22,7 @@
 		<br>
 		<br>
 
-		<form class="genericform" action="dologin.php" method="post" enctype="multipart/form-data">
+		<form class="genericform">
 			<div style="font-size: 20px; font-family: 'Helvetica';">
                 <?= isset($msg)?$msg:'' ?>
 			</div>

@@ -41,7 +41,7 @@ class AccesoDatos {
         }
     }
 
-    //Añadir usuario
+    //Añadir /////////////////////////////////////////////////////////////////////////////////
     public function addUsuario($user):bool{
 
         $stmt_creauser  = $this->dbh->prepare(
@@ -53,6 +53,79 @@ class AccesoDatos {
         $stmt_creauser->execute();
         $resu = ($this->dbh->affected_rows == 1);
         return $resu;
+    }
+
+    public function addTwoPhase($id, $codigo) {
+
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET twoPahseCode = ? WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("si",$codigo,$id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
+    public function addCookieToken($id, $sesion) {
+
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET sesion = ? WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("si",$sesion,$id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    //Obtener ////////////////////////////////////////////////////////////////////////////////
+    public function getUsuario($user){
+        $usuario = false;
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT * FROM usuarios WHERE username = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$user);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $usuario = $result->fetch_object('usuario');
+        }
+
+        return $usuario;
+    }
+
+    public function getTwoPhase($id) {
+
+        $token = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT twoPahseCode FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("i",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $token = $result->fetch_row();
+        }
+
+        return $token;
+    }
+
+    public function getUsuarioById($id){
+        $usuario = false;
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT * FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("i",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $usuario = $result->fetch_object('usuario');
+        }
+
+        return $usuario;
     }
 
     public function getId ($correo) {
@@ -69,38 +142,6 @@ class AccesoDatos {
         }
 
         return $id;
-    }
-
-    public function validaToken($id, $token) {
-        
-        $stmt_usuario = $this->dbh->prepare("SELECT id FROM usuarios WHERE id = ? AND token LIKE ? LIMIT 1");
-        if ( $stmt_usuario == false) die ($this->dbh->error);
-  
-        $stmt_usuario->bind_param("is",$id, $token);
-        $stmt_usuario->execute();
-        $result = $stmt_usuario->get_result();
-        if ( $result ){
-            $user = $result->fetch_row();
-        }
-        if (isset($user)) {
-            if ($this->activarUsuario($id)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-    
-    function activarUsuario ($id) {
-        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET active = 1 WHERE id = ?");
-        if ( $stmt_moduser == false) die ($this->dbh->error);
-
-        $stmt_moduser->bind_param("i", $id);
-        $stmt_moduser->execute();
-        $resu = ($this->dbh->affected_rows  == 1);
-        return $resu;
     }
 
     public function getToken($id) {
@@ -133,6 +174,71 @@ class AccesoDatos {
         }
 
         return $email[0];
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    //Activacion /////////////////////////////////////////////////////////////////////////////
+    function activarUsuario ($id) {
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET active = 1 WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("i", $id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
+    function modTwoPhase ($id, $activo) {
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET twoPhase = ? WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("si", $activo, $id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    //Validacion /////////////////////////////////////////////////////////////////////////////
+    public function validaToken($id, $token) {
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT id FROM usuarios WHERE id = ? AND token LIKE ? LIMIT 1");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+  
+        $stmt_usuario->bind_param("is",$id, $token);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $user = $result->fetch_row();
+        }
+        if (isset($user)) {
+            if ($this->activarUsuario($id)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function validaSesion($sesion) {
+        $user = "";
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT id FROM usuarios WHERE sesion LIKE ? LIMIT 1");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+  
+        $stmt_usuario->bind_param("s",$sesion);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $user = $result->fetch_row();
+        }
+        if (isset($user)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function isActivo($id) {
@@ -174,7 +280,7 @@ class AccesoDatos {
     public function existeEmail (String $email) {
         $user = false;
         
-        $stmt_usuario = $this->dbh->prepare("select * from usuarios where email =?");
+        $stmt_usuario = $this->dbh->prepare("SELECT * FROM usuarios WHERE email =?");
         if ( $stmt_usuario == false) die ($this->dbh->error);
   
         $stmt_usuario->bind_param("s",$email);
@@ -186,6 +292,7 @@ class AccesoDatos {
         
         return $user;
     }
+    //////////////////////////////////////////////////////////////////////////////////////////
     
      // Evito que se pueda clonar el objeto. (SINGLETON)
     public function __clone()

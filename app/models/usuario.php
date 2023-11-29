@@ -9,7 +9,8 @@ class Usuario {
     private $active;
     private $twoPhase;
     private $token;
-    
+    private $twoPahseCode;
+    private $sesion;
 
     
     function __set($name, $value)

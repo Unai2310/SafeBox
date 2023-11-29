@@ -22,19 +22,23 @@
 		<br>
 		<br>
 
-		<form class="genericform" action="dologin.php" method="post" enctype="multipart/form-data">
+		<form class="genericform" action="/safebox/" method="POST" autocomplete="off">
 			Usuario: 
 			<br> 
-			<input class="stylized" type="text" name="username" required=""> 
+			<input class="stylized" type="text" name="username" value="<?= isset($user)?$user:'' ?>" required=""> 
 			<br> 
+			<?= isset($msgname)?$msgname:'' ?>
+			<br>
 			<br>
 			Contraseña: 
 			<br> 
 			<input class="stylized" type="password" name="password" required=""> 
 			<br> 
+			<?= isset($msgpass)?$msgpass:'' ?>
 			<br>
+			<input class="stylized" id="recuerda" type="checkbox" value="1" name="recordar"><label for="recuerda">Recordarme</label>
 			<br>
-			<input type="submit" value="Login" name="submit">
+			<input type="submit" value="Login" name="orden">
 			<br>
 			<br>
 			<div style="font-size: 16px; font-family: 'Helvetica';">No tienes cuenta? <a class="botonlink" href="?orden=registrar"> Registrate </a>

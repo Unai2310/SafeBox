@@ -1,3 +1,17 @@
+<?php
+    $_SESSION["token"] = md5(uniqid(mt_rand(), true));
+	if (isset($_COOKIE["recordar"]) && isset($_COOKIE["recordarid"])) {
+		$db = AccesoDatos::getModelo();
+		$db->validaSesion($_COOKIE["recordar"]);
+		$us = $db->getUsuarioById($_COOKIE["recordarid"]);
+		$_SESSION["id"] = $us->id;
+		$_SESSION["nombre"] = $us->name;
+		$_SESSION["username"] = $us->username;
+		$_SESSION["email"] = $us->email;
+		$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
+		$_SESSION["twophaseon"] = $_COOKIE["twophasemsg"];
+	}
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -57,13 +71,17 @@
 
 		<center>
 			<div class="filalinks"> 
-				<a href="?orden=login" class="botonlink">Login</a> | 
-				<a href="?orden=registrar" class="botonlink">Resgistrar</a> | 
+				<a href="?orden=login" class="botonlink"><?= isset($_SESSION["nombre"])?$_SESSION["nombre"]:'Login' ?></a> | 
+				<?= isset($_SESSION["cierresesion"])?$_SESSION["cierresesion"]:'<a href="?orden=registrar" class="botonlink">Registrar</a>' ?> | 
 				<a href="" class="botonlink">Informacion</a>  | 
 				<a href="#" class="botonlink" id="changeTheme">Modo oscuro</a>
 			</div>
 		</center>
 
-		<input type="file" multiple="multiple" class="dz-hidden-input" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
+		<div class="notetiny" style="margin-top: 25px;">
+			<?= isset($_SESSION["twophasemsg"])?$_SESSION["twophasemsg"]:'Activa la <a class="botonlink" href="?orden=activar&csrf='.$_SESSION["token"].'">verificacion</a> en dos pasos para aumentar la seguridad de tu cuenta' ?>
+			
+		</div>
+
 	</body>
 </html>
