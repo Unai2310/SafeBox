@@ -1,15 +1,14 @@
 <?php
-    $_SESSION["token"] = md5(uniqid(mt_rand(), true));
-	if (isset($_COOKIE["recordar"]) && isset($_COOKIE["recordarid"])) {
+	if (isset($_COOKIE["recordar"])) {
 		$db = AccesoDatos::getModelo();
-		$db->validaSesion($_COOKIE["recordar"]);
-		$us = $db->getUsuarioById($_COOKIE["recordarid"]);
-		$_SESSION["id"] = $us->id;
-		$_SESSION["nombre"] = $us->name;
-		$_SESSION["username"] = $us->username;
-		$_SESSION["email"] = $us->email;
-		$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-		$_SESSION["twophaseon"] = $_COOKIE["twophasemsg"];
+		if ($db->validaSesion($_COOKIE["recordar"])) {
+			$us = $db->getUsuarioBySesion($_COOKIE["recordar"]);
+			$_SESSION["id"] = $us->id;
+			$_SESSION["nombre"] = $us->name;
+			$_SESSION["username"] = $us->username;
+			$_SESSION["email"] = $us->email;
+			$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
+		}
 	}
 ?>
 <!DOCTYPE html>
@@ -30,7 +29,7 @@
 	<body style="background-image: url('/safebox/web/resources/texture3.png');">
 
 		<header>
-			<img src="/safebox/web/resources/litterbox.png" style="margin: auto; display: block;">
+			<img src="/safebox/web/resources/safebox.png" style="margin: auto; display: block;">
 		</header>
 
 		<br>
@@ -77,11 +76,6 @@
 				<a href="#" class="botonlink" id="changeTheme">Modo oscuro</a>
 			</div>
 		</center>
-
-		<div class="notetiny" style="margin-top: 25px;">
-			<?= isset($_SESSION["twophasemsg"])?$_SESSION["twophasemsg"]:'Activa la <a class="botonlink" href="?orden=activar&csrf='.$_SESSION["token"].'">verificacion</a> en dos pasos para aumentar la seguridad de tu cuenta' ?>
-			
-		</div>
 
 	</body>
 </html>

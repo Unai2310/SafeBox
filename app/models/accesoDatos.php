@@ -128,6 +128,22 @@ class AccesoDatos {
         return $usuario;
     }
 
+    public function getUsuarioBySesion($sesion){
+        $usuario = false;
+        
+        $stmt_usuario = $this->dbh->prepare("SELECT * FROM usuarios WHERE sesion = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("s",$sesion);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        if ( $result ){
+            $usuario = $result->fetch_object('usuario');
+        }
+
+        return $usuario;
+    }
+
     public function getId ($correo) {
         $id = "";
 
@@ -193,6 +209,16 @@ class AccesoDatos {
         if ( $stmt_moduser == false) die ($this->dbh->error);
 
         $stmt_moduser->bind_param("si", $activo, $id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
+    function modPwd ($id, $pwd) {
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET pwd = ? WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("si", $pwd, $id);
         $stmt_moduser->execute();
         $resu = ($this->dbh->affected_rows  == 1);
         return $resu;

@@ -32,7 +32,7 @@
                 <br> 
                 <?= isset($error)?$error:'' ?>
                 <br>
-                <input type="submit" value="Verificar" name="orden">
+                <input type="submit" value="<?= isset($accion)?$accion:'' ?>" name="orden">
                 <input type="hidden" value="<?= isset($identificador)?$identificador:'' ?>" name="identificador">
                 <br>
                 <br>

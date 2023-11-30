@@ -31,6 +31,7 @@ function crudPostIngreso(){
                 $htmlcompleto = $partes[0]."$codigo".$partes[1];
                 $_SESSION["twophaseon"] = "ON";
                 enviarCorreo($us->email,"Verificacion en 2 pasos", $htmlcompleto);
+                $accion = "Verificar";
                 include_once "app/views/twophaseform.php";
             } else {
                 $_SESSION["id"] = $us->id;
@@ -38,13 +39,11 @@ function crudPostIngreso(){
                 $_SESSION["username"] = $us->username;
                 $_SESSION["email"] = $us->email;
                 $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-                $_SESSION["twophaseon"] = "ON";
 
                 if (isset($_POST["recordar"])) {
                     $tokenSesion = generarTokenCookie();
+                    $db->addCookieToken($us->id, $tokenSesion);
                     setcookie("recordar", $tokenSesion, time() + 60);
-                    setcookie("recordarid", $us->id, time() + 60);
-                    setcookie("twophasemsg", "ON", time() + 60);
                 }
                 
                 include_once "app/views/principal.php";
@@ -53,11 +52,72 @@ function crudPostIngreso(){
     }
 }
 
+function crudPostActivar() {
+    limpiarArrayEntrada($_POST);
+    $db = AccesoDatos::getModelo();
+    $us = $db->getUsuarioById($_POST["identificador"]);
+    if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
+        $db->modTwoPhase($_SESSION["id"],1);
+        include_once "app/views/principal.php";
+    } else {
+        $msg = "Estas a punto de activar la <strong>verificación en dos pasos</strong>. <br>
+        Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+        Introduce este codigo para activar la verificación";
+        $identificador = $us->id;
+        $error = "El codigo no es correcto";
+        $accion = "Activar";
+        include_once "app/views/twophaseform.php";
+    }
+}
+
+function crudPostDesactivar() {
+    limpiarArrayEntrada($_POST);
+    $db = AccesoDatos::getModelo();
+    $us = $db->getUsuarioById($_POST["identificador"]);
+    if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
+        $db->modTwoPhase($_SESSION["id"],0);
+        unset($_SESSION["twophasemsg"]);
+        include_once "app/views/principal.php";
+    } else {
+        $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
+        Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+        Introduce este codigo para activar la verificación. <br>
+        Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
+        $identificador = $us->id;
+        $error = "El codigo no es correcto";
+        $accion = "Desactivar";
+        include_once "app/views/twophaseform.php";
+    }
+}
+
+function crudPostCambiarPwd() {
+    limpiarArrayEntrada($_POST);
+    $db = AccesoDatos::getModelo();
+    $us = $db->getUsuarioById($_POST["identificador"]);
+    if(isset($_SESSION["cambiopwd"])) {
+        if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
+            $db->modPwd($_POST["identificador"], $_SESSION["cambiopwd"]);
+            AccesoDatos::closeModelo();
+            session_destroy();
+            $msgpass = "Contrseña cambiada";
+            header("Location: ./?orden=login");
+        } else {
+            $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
+            Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+            Introduce este codigo para poder cambiar la contraseña";
+            $identificador = $us->id;
+            $error = "El codigo no es correcto";
+            $accion = "Cambiar";
+            include_once "app/views/twophaseform.php";
+        }
+    }   
+}
+
 function crudPostVerificar(){
     limpiarArrayEntrada($_POST);
     $db = AccesoDatos::getModelo();
     $us = $db->getUsuarioById($_POST["identificador"]);
-    if (isset($_SESSION["twophaseon"])) {
+    if (isset($_SESSION["twophaseon"]) && !isset($_SESSION["cambiopwd"])) {
         if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
             $_SESSION["id"] = $us->id;
             $_SESSION["nombre"] = $us->name;
@@ -65,12 +125,10 @@ function crudPostVerificar(){
             $_SESSION["email"] = $us->email;
             $db->modTwoPhase($_SESSION["id"],1);
             $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-            $_SESSION["twophasemsg"] = "Desactivar la <a class=\"botonlink\" href=\"?orden=desactivar\">verificacion</a> en dos pasos. La seguridad de la cuenta disminuirá";
             if (isset($_POST["recordar"])) {
                 $tokenSesion = generarTokenCookie();
+                $db->addCookieToken($us->id, $tokenSesion);
                 setcookie("recordar", $tokenSesion, time() + 60);
-                setcookie("recordarid", $db->getId($us->email), time() + 60);
-                setcookie("twophasemsg", "Desactivar la <a class=\"botonlink\" href=\"?orden=desactivar\">verificacion</a> en dos pasos. La seguridad de la cuenta disminuirá", time() + 60);
             }
             include_once "app/views/principal.php";
         } else {
@@ -79,25 +137,10 @@ function crudPostVerificar(){
             Introduce este codigo para poder iniciar sesión";
             $identificador = $us->id;
             $error = "El codigo no es correcto";
+            $accion = "Verificar";
             include_once "app/views/twophaseform.php";
         }
-    } else {
-        if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
-            $db->modTwoPhase($_SESSION["id"],0);
-            unset($_SESSION["twophasemsg"]);
-            include_once "app/views/principal.php";
-        } else {
-            $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
-            Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
-            Introduce este codigo para activar la verificación. <br>
-            Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
-            $identificador = $us->id;
-            $error = "El codigo no es correcto";
-            unset($_SESSION["twophasemsg"]);
-            include_once "app/views/twophaseform.php";
-        }
-        
-    }    
+    } 
 }
 
 function crudPostRegistro(){
@@ -119,7 +162,6 @@ function crudPostRegistro(){
         $nom = $us->name;
         $usr = $us->username;
         $eml = $us->email;
-        
         include_once "app/views/registro.php";
     } else {
         $db->addUsuario($us);
@@ -127,6 +169,77 @@ function crudPostRegistro(){
         enviarCorreo($eml, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml), $us->token));
         include_once "app/views/postregistro.php";
     }
+}
+
+function crudPostCambiarInfo() {
+    $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
+    Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+    Introduce este codigo para poder cambiar la contraseña";
+    $db = AccesoDatos::getModelo();
+    $identificador = $_SESSION["id"];
+    $codigo = createTwoPhase();
+    $db->addTwoPhase($identificador, $codigo);
+    $html = file_get_contents("app/views/bodycorreocambiarpwd.html");
+    $partes = explode("&",$html);
+    $htmlcompleto = $partes[0]."$codigo".$partes[1];
+    enviarCorreo($_SESSION["email"],"Cambio de Contrseña", $htmlcompleto);
+    $_SESSION["cambiopwd"] = sha1($_POST["password"]);
+    $accion = "Cambiar";
+    include_once "app/views/twophaseform.php";
+    
+}
+
+function crudManejarCuenta() {
+    checkCSRF();
+    if (isset($_SESSION["id"])) {
+        $db = AccesoDatos::getModelo();
+        $us = $db->getUsuarioById($_SESSION["id"]);
+        $email = $us->email;
+    }
+    include_once "app/views/manejacuenta.php";
+}
+
+function crudrevalidarUsuario() {
+    $db = AccesoDatos::getModelo();
+    $eml = $db->getEmail($_GET["id"]);
+    $token = $db->getToken($_GET["id"]);
+    enviarCorreo($eml, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml),$token));
+    include_once "app/views/postregistro.php";
+}
+
+function crudActivar() {
+    checkCSRF();
+    $msg = "Estas a punto de activar la <strong>verificación en dos pasos</strong>. <br>
+    Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+    Introduce este codigo para activar la verificación";
+    $identificador = $_SESSION["id"];
+    $accion = "Activar";
+    $codigo = createTwoPhase();
+    $db = AccesoDatos::getModelo();
+    $db->addTwoPhase($_SESSION["id"], $codigo);
+    $html = file_get_contents("app/views/bodycorreoverificar.html");
+    $partes = explode("&",$html);
+    $htmlcompleto = $partes[0]."$codigo".$partes[1];
+    enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
+    include_once "app/views/twophaseform.php";
+}
+
+function cruddesactivar() {
+    checkCSRF();
+    $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
+    Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+    Introduce este codigo para activar la verificación. <br>
+    Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
+    $identificador = $_SESSION["id"];
+    $accion = "Desactivar";
+    $codigo = createTwoPhase();
+    $db = AccesoDatos::getModelo();
+    $db->addTwoPhase($_SESSION["id"], $codigo);
+    $html = file_get_contents("app/views/bodycorreoverificar.html");
+    $partes = explode("&",$html);
+    $htmlcompleto = $partes[0]."$codigo".$partes[1];
+    enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
+    include_once "app/views/twophaseform.php";
 }
 
 function crudvalidarUsuario() {
@@ -151,61 +264,7 @@ function crudvalidarUsuario() {
     }
 }
 
-function crudrevalidarUsuario() {
-    $db = AccesoDatos::getModelo();
-    $eml = $db->getEmail($_GET["id"]);
-    $token = $db->getToken($_GET["id"]);
-    enviarCorreo($eml, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml),$token));
-    include_once "app/views/postregistro.php";
-}
-
-function crudActivar() {
-    if (isset($_SESSION["id"])) {
-        checkCSRF();
-        $msg = "Estas a punto de activar la <strong>verificación en dos pasos</strong>. <br>
-        Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
-        Introduce este codigo para activar la verificación";
-        $identificador = $_SESSION["id"];
-        $codigo = createTwoPhase();
-        $db = AccesoDatos::getModelo();
-        $db->addTwoPhase($_SESSION["id"], $codigo);
-        $html = file_get_contents("app/views/bodycorreoverificar.html");
-        $partes = explode("&",$html);
-        $htmlcompleto = $partes[0]."$codigo".$partes[1];
-        enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
-        $_SESSION["twophasemsg"] = "Desactivar la <a class=\"botonlink\" href=\"?orden=desactivar&csrf=".$_SESSION["token"]."\">verificacion</a> en dos pasos. La seguridad de la cuenta disminuirá";
-        include_once "app/views/twophaseform.php";
-    } else {
-        session_destroy();
-        header("Location: ./");
-    }
-}
-
-function cruddesactivar() {
-    if (isset($_SESSION["id"])) {
-        checkCSRF();
-        $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
-        Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
-        Introduce este codigo para activar la verificación. <br>
-        Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
-        $identificador = $_SESSION["id"];
-        $codigo = createTwoPhase();
-        $db = AccesoDatos::getModelo();
-        $db->addTwoPhase($_SESSION["id"], $codigo);
-        $html = file_get_contents("app/views/bodycorreoverificar.html");
-        $partes = explode("&",$html);
-        $htmlcompleto = $partes[0]."$codigo".$partes[1];
-        enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
-        unset($_SESSION["twophaseon"]);
-        include_once "app/views/twophaseform.php";
-    } else {
-        session_destroy();
-        header("Location: ./");
-    }
-}
-
 function crudTerminar(){
     AccesoDatos::closeModelo();
     session_destroy();
-    header("Location: ./");
 }
