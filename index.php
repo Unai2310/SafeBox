@@ -20,6 +20,8 @@ if (isset($_GET["orden"])) {
         case "cerrar"       : crudTerminar(); break;
         case "activar"      : crudActivar(); break;
         case "desactivar"   : cruddesactivar(); break;
+        case "recuperar"    : crudRecuperarContraseña(); break;
+        
     }
 } else  if (isset($_POST["orden"])){
     switch ($_POST['orden']) {
@@ -29,7 +31,8 @@ if (isset($_GET["orden"])) {
         case "Activar"              : crudPostActivar(); break;
         case "Desactivar"           : crudPostDesactivar(); break;
         case "Cambiar Contraseña"   : crudPostCambiarInfo(); break;
-        case "Cambiar"              : crudPostCambiarPwd(); break;
+        case "Cambiar"              : crudPostCambiarPwd(); break; 
+        case "Recuperar"            : crudPostRecuperarPwd(); break;
     }
 } else {
     require_once "app/views/principal.php";

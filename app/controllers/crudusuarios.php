@@ -29,7 +29,6 @@ function crudPostIngreso(){
                 $html = file_get_contents("app/views/bodycorreoverificar.html");
                 $partes = explode("&",$html);
                 $htmlcompleto = $partes[0]."$codigo".$partes[1];
-                $_SESSION["twophaseon"] = "ON";
                 enviarCorreo($us->email,"Verificacion en 2 pasos", $htmlcompleto);
                 $accion = "Verificar";
                 include_once "app/views/twophaseform.php";
@@ -99,7 +98,6 @@ function crudPostCambiarPwd() {
             $db->modPwd($_POST["identificador"], $_SESSION["cambiopwd"]);
             AccesoDatos::closeModelo();
             session_destroy();
-            $msgpass = "Contrseña cambiada";
             header("Location: ./?orden=login");
         } else {
             $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
@@ -113,34 +111,68 @@ function crudPostCambiarPwd() {
     }   
 }
 
+function crudPostRecuperarPwd() {
+    limpiarArrayEntrada($_POST);
+    $db = AccesoDatos::getModelo();
+    if (regexEmail($_POST['codigo'])) {
+        $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
+        Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
+        El código que hay en el correo se podrá usar para iniciar sesión. <br>
+        Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+        $error = "Introduce un correo valido";
+        $accion = "Recuperar";
+        include_once "app/views/twophaseform.php";
+    } else if (!$db->existeEmail($_POST['codigo'])) {
+        $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
+        Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
+        El código que hay en el correo se podrá usar para iniciar sesión. <br>
+        Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+        $error = "No es un correo asociado a ninguna cuenta";
+        $accion = "Recuperar";
+        include_once "app/views/twophaseform.php";
+    } else {
+        $codigosincifrar = generarTokenCookie();
+        $codigo = sha1($codigosincifrar);
+        $html = file_get_contents("app/views/bodycorreorecuperarpwd.html");
+        $partes = explode("&",$html);
+        $htmlcompleto = $partes[0]."$codigosincifrar".$partes[1];
+        $idus = $db->getId($_POST['codigo'])[0];
+        $db->modPwd($idus, $codigo);
+        enviarCorreo($_POST['codigo'],"Recuperacion de Contraseña", $htmlcompleto);
+        AccesoDatos::closeModelo();
+        session_destroy();
+        header("Location: ./?orden=login");
+    }
+
+
+}
+
 function crudPostVerificar(){
     limpiarArrayEntrada($_POST);
     $db = AccesoDatos::getModelo();
     $us = $db->getUsuarioById($_POST["identificador"]);
-    if (isset($_SESSION["twophaseon"]) && !isset($_SESSION["cambiopwd"])) {
-        if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
-            $_SESSION["id"] = $us->id;
-            $_SESSION["nombre"] = $us->name;
-            $_SESSION["username"] = $us->username;
-            $_SESSION["email"] = $us->email;
-            $db->modTwoPhase($_SESSION["id"],1);
-            $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-            if (isset($_POST["recordar"])) {
-                $tokenSesion = generarTokenCookie();
-                $db->addCookieToken($us->id, $tokenSesion);
-                setcookie("recordar", $tokenSesion, time() + 60);
-            }
-            include_once "app/views/principal.php";
-        } else {
-            $msg = "Esta cuenta tiene activada la <strong>verificación en dos pasos</strong>. <br>
-            Hemos enviado un correo a la direccion ".$us->email.". <br>
-            Introduce este codigo para poder iniciar sesión";
-            $identificador = $us->id;
-            $error = "El codigo no es correcto";
-            $accion = "Verificar";
-            include_once "app/views/twophaseform.php";
+    if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
+        $_SESSION["id"] = $us->id;
+        $_SESSION["nombre"] = $us->name;
+        $_SESSION["username"] = $us->username;
+        $_SESSION["email"] = $us->email;
+        $db->modTwoPhase($_SESSION["id"],1);
+        $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
+        if (isset($_POST["recordar"])) {
+            $tokenSesion = generarTokenCookie();
+            $db->addCookieToken($us->id, $tokenSesion);
+            setcookie("recordar", $tokenSesion, time() + 60);
         }
-    } 
+        include_once "app/views/principal.php";
+    } else {
+        $msg = "Esta cuenta tiene activada la <strong>verificación en dos pasos</strong>. <br>
+        Hemos enviado un correo a la direccion ".$us->email.". <br>
+        Introduce este codigo para poder iniciar sesión";
+        $identificador = $us->id;
+        $error = "El codigo no es correcto";
+        $accion = "Verificar";
+        include_once "app/views/twophaseform.php";
+    }
 }
 
 function crudPostRegistro(){
@@ -187,6 +219,15 @@ function crudPostCambiarInfo() {
     $accion = "Cambiar";
     include_once "app/views/twophaseform.php";
     
+}
+
+function crudRecuperarContraseña() {
+    $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
+    Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
+    El código que hay en el correo se podrá usar para iniciar sesión. <br>
+    Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+    $accion = "Recuperar";
+    include_once "app/views/twophaseform.php";
 }
 
 function crudManejarCuenta() {
@@ -267,4 +308,5 @@ function crudvalidarUsuario() {
 function crudTerminar(){
     AccesoDatos::closeModelo();
     session_destroy();
+    header("Location: ./");
 }

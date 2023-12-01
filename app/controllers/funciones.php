@@ -49,7 +49,7 @@ function getHtmlBody($id, $token) {
 }
 
 function regexEmail($email) {
-    $regex = '/^([a-zA-Z0-9\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/';
+    $regex = '/^([a-zA-Z0-9_@.#&+-\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/';
     if (preg_match($regex,$email)) {
         return false;
     } else {

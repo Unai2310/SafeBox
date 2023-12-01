@@ -43,7 +43,7 @@
 			<br>
 			<div style="font-size: 16px; font-family: 'Helvetica';">No tienes cuenta? <a class="botonlink" href="?orden=registrar"> Registrate </a>
 				<br> 
-				<a class="botonlink" href="">Olvidaste tu contraseña?</a>
+				<a class="botonlink" href="?orden=recuperar">Olvidaste tu contraseña?</a>
 			</div>
 		</form>
 	</body>

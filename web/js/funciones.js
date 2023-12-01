@@ -37,11 +37,27 @@ document.addEventListener("DOMContentLoaded", function() {
                 body: fileData
             }).then(res => res.json()).then(data => {
                 console.log(data);
+                const obj = JSON.parse(JSON.stringify(data));
+                let arrtag = document.getElementsByTagName("span");
+                let spanbueno = null;
+                for (i = 0; i < arrtag.length; i++) {
+                    if (arrtag[i].textContent == obj.loco) {
+                        spanbueno = arrtag[i];
+                    }
+                }
+                spanbueno.textContent = data.name;
+                spanbueno.addEventListener("click", function() {
+                    let copiar = this.textContent;
+                    let input = document.createElement('input');
+                    input.value = copiar;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    input.remove()
+                    alert("Copiado");
+                });
             })
         })
-
-    }
-
-    
+    }   
 });
 
