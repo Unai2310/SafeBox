@@ -26,7 +26,7 @@
             <div style="font-size: 20px; font-family: 'Helvetica';">
                 <?= isset($msg)?$msg:'' ?>
                 <br>
-                Codigo: 
+                <?= isset($recpwd)?$recpwd:'Codigo: ' ?>
                 <br> 
                 <input class="stylized" type="text" name="codigo" required=""> 
                 <br> 

@@ -1,6 +1,6 @@
 <?php
 
-require_once '../models/accesoDatos.php';
+require_once '../models/accesoDatosUsuario.php';
 require_once ('funciones.php');
 require_once '../config/configDB.php';
 

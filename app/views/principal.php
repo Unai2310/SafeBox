@@ -10,6 +10,10 @@
 			$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
 		}
 	}
+
+	if (isset($_SESSION["id"]) && !isset($_COOKIE["subida"])) {
+		setcookie("subida", $_SESSION["id"], time() + 3600);
+	}
 ?>
 <!DOCTYPE html>
 <html>

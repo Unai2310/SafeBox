@@ -23,10 +23,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById('dropzoneSubida')) {
         let myDropzone = new Dropzone('.dropzone', {
             url: '/safebox', 
-            maxFileSize: 1000000000,
+            maxFileSize: 200000000,
             acceptedFiles: 'image/jpeg, image/png',
             addRemoveLinks: true,
-            dictRemoveFile: "Quitar"
+            dictRemoveFile: "Quitar",
+            parallelUploads: 1
         })
 
         myDropzone.on('addedfile', file => {
@@ -41,19 +42,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 let arrtag = document.getElementsByTagName("span");
                 let spanbueno = null;
                 for (i = 0; i < arrtag.length; i++) {
-                    if (arrtag[i].textContent == obj.loco) {
+                    if (arrtag[i].textContent == obj.full_path) {
                         spanbueno = arrtag[i];
                     }
                 }
                 spanbueno.textContent = data.name;
                 spanbueno.addEventListener("click", function() {
                     let copiar = this.textContent;
-                    let input = document.createElement('input');
-                    input.value = copiar;
-                    document.body.appendChild(input);
-                    input.select();
-                    document.execCommand('copy');
-                    input.remove()
+                    navigator.clipboard.writeText("http://flo.no-ip.info/uploads/"+copiar);
                     alert("Copiado");
                 });
             })

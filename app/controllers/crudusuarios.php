@@ -156,7 +156,6 @@ function crudPostVerificar(){
         $_SESSION["nombre"] = $us->name;
         $_SESSION["username"] = $us->username;
         $_SESSION["email"] = $us->email;
-        $db->modTwoPhase($_SESSION["id"],1);
         $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
         if (isset($_POST["recordar"])) {
             $tokenSesion = generarTokenCookie();
@@ -204,20 +203,28 @@ function crudPostRegistro(){
 }
 
 function crudPostCambiarInfo() {
-    $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
-    Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
-    Introduce este codigo para poder cambiar la contraseña";
-    $db = AccesoDatos::getModelo();
-    $identificador = $_SESSION["id"];
-    $codigo = createTwoPhase();
-    $db->addTwoPhase($identificador, $codigo);
-    $html = file_get_contents("app/views/bodycorreocambiarpwd.html");
-    $partes = explode("&",$html);
-    $htmlcompleto = $partes[0]."$codigo".$partes[1];
-    enviarCorreo($_SESSION["email"],"Cambio de Contrseña", $htmlcompleto);
-    $_SESSION["cambiopwd"] = sha1($_POST["password"]);
-    $accion = "Cambiar";
-    include_once "app/views/twophaseform.php";
+    checkCSRF();
+    if ($_POST["password"] != "") {
+        $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
+        Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
+        Introduce este codigo para poder cambiar la contraseña";
+        $db = AccesoDatos::getModelo();
+        $identificador = $_SESSION["id"];
+        $codigo = createTwoPhase();
+        $db->addTwoPhase($identificador, $codigo);
+        $html = file_get_contents("app/views/bodycorreocambiarpwd.html");
+        $partes = explode("&",$html);
+        $htmlcompleto = $partes[0]."$codigo".$partes[1];
+        enviarCorreo($_SESSION["email"],"Cambio de Contrseña", $htmlcompleto);
+        $_SESSION["cambiopwd"] = sha1($_POST["password"]);
+        $accion = "Cambiar";
+        include_once "app/views/twophaseform.php";
+    } else {
+        $email=$_SESSION["email"];
+        $nopwd="No pudes dejar este campo vacio";
+        include_once "app/views/manejacuenta.php";
+    }
+    
     
 }
 
@@ -227,16 +234,13 @@ function crudRecuperarContraseña() {
     El código que hay en el correo se podrá usar para iniciar sesión. <br>
     Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
     $accion = "Recuperar";
+    $recpwd = "Correo: ";
     include_once "app/views/twophaseform.php";
 }
 
 function crudManejarCuenta() {
     checkCSRF();
-    if (isset($_SESSION["id"])) {
-        $db = AccesoDatos::getModelo();
-        $us = $db->getUsuarioById($_SESSION["id"]);
-        $email = $us->email;
-    }
+    $email = $_SESSION["email"];
     include_once "app/views/manejacuenta.php";
 }
 

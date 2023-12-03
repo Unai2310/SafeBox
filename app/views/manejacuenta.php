@@ -1,4 +1,6 @@
-
+<?php
+    $_SESSION["token"] = md5(uniqid(mt_rand(), true));
+?>
 <html>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -33,8 +35,9 @@
             <br>
             <br>
             Password:<input type="password" name="password" id="password" value="">
-            <div style="font-size: 12px;"><i>Deja en blanco el campo que no quieras cambiar</i></div>
+            <div style="font-size: 12px;"><i><?= isset($nopwd)?$nopwd:'Pon la nueva contraseña y pulsa cambiar' ?></i></div>
             <br>
+            <input type="hidden" name="csrf" value="<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>">
             <input type="submit" value="Cambiar Contraseña" name="orden">
         </form>
 

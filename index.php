@@ -7,7 +7,7 @@ require_once 'app/helpers/util.php';
 require_once 'app/config/configDB.php';
 require_once 'app/models/usuario.php';
 require_once 'app/controllers/crudusuarios.php';
-require_once 'app/models/accesoDatos.php';
+require_once 'app/models/accesoDatosUsuario.php';
 
 
 if (isset($_GET["orden"])) {
