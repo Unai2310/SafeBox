@@ -59,7 +59,8 @@
 			<form action="" class="dropzone" id="dropzoneSubida">
 				<input type="hidden" id="time" name="tiempo" value="1">
 				<div class="dz-message" data-dz-message>
-					<span>Arrastra o selecciona los archivos</span>
+					<span>Arrastra o selecciona los archivos</span><br>
+					<span>Haz click en el nombre para copiar su dirección</span>
 				</div>
 			</form>
 		</center>
