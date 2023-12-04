@@ -2,6 +2,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+
+use Carbon\Carbon;
+
 require_once __DIR__."/../composer/vendor/autoload.php";
 
 function enviarCorreo($correo, $subject, $body) {
@@ -71,4 +74,11 @@ function checkCSRF(){
         header("Location: ./");
         exit();
     }
+}
+
+
+function sumaHoras($horasumar) {
+    $carb = Carbon::now('Europe/Madrid');
+    $horafinal = $carb->addHours($horasumar);
+    return $horafinal;
 }

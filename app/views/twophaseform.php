@@ -1,3 +1,6 @@
+<?php
+    $_SESSION["token"] = md5(uniqid(mt_rand(), true));
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -29,6 +32,7 @@
                 <?= isset($recpwd)?$recpwd:'Codigo: ' ?>
                 <br> 
                 <input class="stylized" type="text" name="codigo" required=""> 
+				<input type="hidden" name="csrf" value="<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>">
                 <br> 
                 <?= isset($error)?$error:'' ?>
                 <br>

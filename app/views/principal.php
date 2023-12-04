@@ -10,10 +10,6 @@
 			$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
 		}
 	}
-
-	if (isset($_SESSION["id"]) && !isset($_COOKIE["subida"])) {
-		setcookie("subida", $_SESSION["id"], time() + 3600);
-	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -46,15 +42,14 @@
 
 		<div class="contenerdorExpiracion">
 			<span style="vertical-align: -webkit-baseline-middle;">Tiempo de retencion:</span>
-			<button class="seclectorTiempo" id="1h" onclick="cambiarBoton(this.id)" style="background-color: #7ADDFF">1<br>Hora</button>
-			<button class="seclectorTiempo" id="12h" onclick="cambiarBoton(this.id)" >12<br>Horas</button>
-			<button class="seclectorTiempo" id="24h" onclick="cambiarBoton(this.id)" >1<br>Dia</button>
-			<button class="seclectorTiempo" id="72h" onclick="cambiarBoton(this.id)" >3<br>Dias</button>
+			<button class="seclectorTiempo" id="1" onclick="cambiarBoton(this.id)" style="background-color: #7ADDFF">1<br>Hora</button>
+			<button class="seclectorTiempo" id="12" onclick="cambiarBoton(this.id)" >12<br>Horas</button>
+			<button class="seclectorTiempo" id="24" onclick="cambiarBoton(this.id)" >1<br>Dia</button>
+			<button class="seclectorTiempo" id="72" onclick="cambiarBoton(this.id)" >3<br>Dias</button>
 		</div>
 
 		<!-- <center>
 			<form action="app/views/" method="post" enctype="multipart/form-data" class="dropzone zonaClicable" id="dropzoneSubida">
-				<input type="hidden" id="time" name="tiempo" value="1h">
 				<input type="hidden" name="reqtype" value="fileupload">
 				<div class="dz-default dz-message"><button class="botonSubida" type="button">Arrastra o selecciona los archivos</button></div>
 			</form>
@@ -62,10 +57,10 @@
 
 		<center>
 			<form action="" class="dropzone" id="dropzoneSubida">
-				
-			<div class="dz-message" data-dz-message>
-				<span>Arrastra o selecciona los archivos</span>
-			</div>
+				<input type="hidden" id="time" name="tiempo" value="1">
+				<div class="dz-message" data-dz-message>
+					<span>Arrastra o selecciona los archivos</span>
+				</div>
 			</form>
 		</center>
 

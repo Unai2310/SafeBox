@@ -6,4 +6,4 @@ define('DATABASE',$_SERVER["DBSAFEBOX"]);
 define('EMAIL',$_SERVER["IMIEL"]);
 define('EMAILPWD',$_SERVER["CONTRAIMIEL"]);
 define('RUTARCHIVOS',$_SERVER["RUTA"]);
-
+define('RUTABORRADO',$_SERVER["BORRADO"]);

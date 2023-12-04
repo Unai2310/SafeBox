@@ -113,6 +113,7 @@ function crudPostCambiarPwd() {
 
 function crudPostRecuperarPwd() {
     limpiarArrayEntrada($_POST);
+    checkCSRF();
     $db = AccesoDatos::getModelo();
     if (regexEmail($_POST['codigo'])) {
         $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
@@ -157,6 +158,7 @@ function crudPostVerificar(){
         $_SESSION["username"] = $us->username;
         $_SESSION["email"] = $us->email;
         $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
+
         if (isset($_POST["recordar"])) {
             $tokenSesion = generarTokenCookie();
             $db->addCookieToken($us->id, $tokenSesion);
