@@ -1,11 +1,13 @@
 <?php
     $_SESSION["token"] = md5(uniqid(mt_rand(), true));
 ?>
+<!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="/safebox/web/css/stylelog.css">
         <meta charset="UTF-8">
+        <script src="/safebox/web/js/funciones.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=0.5">
         <title>SafeBox</title>
     </head>
@@ -45,8 +47,8 @@
 
         <p>Puedes eliminar tu cuenta de SafeBox Todos tus archivos se borraran tanto los públicos como los privados</p>
 
-        <p>Si quieres eliminar tu cuenta pulsa <a class='linkbutton' href='confirm_auth.php'>aqui</a>.</p>
+        <p>Si quieres eliminar tu cuenta pulsa <a class='linkbutton' href="#" onclick="confirmarBorrar('<?=$_SESSION['username']?>','<?=$_SESSION['token']?>');">aqui</a>.</p>
 
-</body>
+    </body>
 
 </html>

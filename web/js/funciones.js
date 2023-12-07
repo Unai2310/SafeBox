@@ -19,13 +19,18 @@ function mostrarContrasena(){
     }
 }
 
+function confirmarBorrar(nombre,csrf){
+    if (confirm("¿Quieres eliminar tu cuenta con username:  "+nombre+"?")) {
+        document.location.href="?orden=borrar&csrf="+csrf;
+    }
+  }
+
 document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById('dropzoneSubida')) {
         let myDropzone = new Dropzone('.dropzone', {
             url: '/safebox', 
             maxFileSize: 209715200,
-            acceptedFiles: 'image/jpeg, image/png, image/gif, audio/mpeg, video/mp4, application/pdf, video/webm'+
-            'text/plain, application/json, application/xml, video/x-msvideo, video/x-matroska',
+            acceptedFiles: 'image/jpeg, image/png, image/gif, audio/mpeg, video/mp4, application/pdf, video/webm, text/plain, application/json, application/xml, video/x-msvideo, video/x-matroska',
             addRemoveLinks: true,
             dictRemoveFile: "Quitar",
             parallelUploads: 1
@@ -54,8 +59,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     spanbueno.textContent = obj.nombre;
                     spanbueno.addEventListener("click", function() {
                         let copiar = this.textContent;
-                        //navigator.clipboard.writeText("http://flo.no-ip.info/uploads/"+copiar);
-                        navigator.clipboard.writeText("http://localhost/uploads/"+copiar);
+                        navigator.clipboard.writeText("http://flo.no-ip.info/uploads/"+copiar);
+                        //navigator.clipboard.writeText("http://localhost/uploads/"+copiar);
                     });
                 } else {
                     alert(obj.error);

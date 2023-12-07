@@ -319,6 +319,18 @@ class AccesoDatos {
         return $user;
     }
     //////////////////////////////////////////////////////////////////////////////////////////
+
+    //Eliminacion ////////////////////////////////////////////////////////////////////////////
+    public function eliminarUsuario($id) {
+        $stmt_usuario = $this->dbh->prepare("DELETE FROM usuarios WHERE id = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+
+        $stmt_usuario->bind_param("i",$id);
+        $stmt_usuario->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////
     
      // Evito que se pueda clonar el objeto. (SINGLETON)
     public function __clone()

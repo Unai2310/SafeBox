@@ -1,7 +1,6 @@
 
 body {
 
-	background-image: url("/bgs/texture3.png");
 	font-family: "Helvetica";
 }
 
@@ -168,7 +167,6 @@ ul li.home{
 	text-align: center;
 	margin: 65px;
 	margin-top: -5px;
-	background-image: url("/bgs/texture8.png");
 	font-size: 26px;
 	display: inline-block;
 
@@ -183,7 +181,6 @@ ul li.home{
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
-	background-image: url("/bgs/texture8.png");
 	font-size: 16px;
 
 }
@@ -197,7 +194,6 @@ ul li.home{
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
-	background-image: url("/bgs/texture8.png");
 	font-size: 22px;
 
 }

@@ -8,6 +8,8 @@ require_once 'app/config/configDB.php';
 require_once 'app/models/usuario.php';
 require_once 'app/controllers/crudusuarios.php';
 require_once 'app/models/accesoDatosUsuario.php';
+require_once 'app/models/accesoDatosArchivo.php';
+require_once 'app/models/archivos.php';
 
 
 if (isset($_GET["orden"])) {
@@ -21,6 +23,7 @@ if (isset($_GET["orden"])) {
         case "activar"      : crudActivar(); break;
         case "desactivar"   : cruddesactivar(); break;
         case "recuperar"    : crudRecuperarContraseña(); break;
+        case "borrar"       : crudBorrarCuenta(); break;
         
     }
 } else  if (isset($_POST["orden"])){

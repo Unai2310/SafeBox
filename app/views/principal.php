@@ -35,25 +35,18 @@
 		<br>
 		<br>
 
-		<center> <div class="bienvenida">Almacena de forma segura todos  los recursos que quieras</div></center>
+		<center> <div class="bienvenida">Almacena de forma segura todos los recursos que quieras</div></center>
 
 		<br>
 		<br>
 
-		<div class="contenerdorExpiracion">
-			<span style="vertical-align: -webkit-baseline-middle;">Tiempo de retencion:</span>
-			<button class="seclectorTiempo" id="1" onclick="cambiarBoton(this.id)" style="background-color: #7ADDFF">1<br>Hora</button>
-			<button class="seclectorTiempo" id="12" onclick="cambiarBoton(this.id)" >12<br>Horas</button>
-			<button class="seclectorTiempo" id="24" onclick="cambiarBoton(this.id)" >1<br>Dia</button>
-			<button class="seclectorTiempo" id="72" onclick="cambiarBoton(this.id)" >3<br>Dias</button>
-		</div>
+		<?php
+			if (!isset($_SESSION["id"])) {
+				$botones = file_get_contents("app/views/botonesretencion.html");
+			} 
+        ?>
 
-		<!-- <center>
-			<form action="app/views/" method="post" enctype="multipart/form-data" class="dropzone zonaClicable" id="dropzoneSubida">
-				<input type="hidden" name="reqtype" value="fileupload">
-				<div class="dz-default dz-message"><button class="botonSubida" type="button">Arrastra o selecciona los archivos</button></div>
-			</form>
-		</center> -->
+		<?= isset($botones)?$botones:'' ?>
 
 		<center>
 			<form action="" class="dropzone" id="dropzoneSubida">

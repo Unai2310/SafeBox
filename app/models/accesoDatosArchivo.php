@@ -44,22 +44,35 @@ class AccesoDatosArchivo {
     //Añadir /////////////////////////////////////////////////////////////////////////////////
     public function addArchivo($archivo):bool{
 
-        $stmt_creauser  = $this->dbh->prepare(
+        $stmt_crearchivo  = $this->dbh->prepare(
             "INSERT INTO `archivos` (`nombre`, `usuario`, `tipoArchivo`, `fechaSubida`, `visibilidad`, `tamanio`)".
             "Values(?,?,?,?,?,?)");
-        if ( $stmt_creauser == false) die ($this->dbh->error);
+        if ( $stmt_crearchivo == false) die ($this->dbh->error);
 
-        $stmt_creauser->bind_param("sissis",$archivo->nombre,$archivo->usuario,$archivo->tipoArchivo,$archivo->fechaSubida,
+        $stmt_crearchivo->bind_param("sissis",$archivo->nombre,$archivo->usuario,$archivo->tipoArchivo,$archivo->fechaSubida,
         $archivo->visibilidad,$archivo->tamanio);
-        $stmt_creauser->execute();
+        $stmt_crearchivo->execute();
         $resu = ($this->dbh->affected_rows == 1);
         return $resu;
     }
     //////////////////////////////////////////////////////////////////////////////////////////
 
     //Obtener ////////////////////////////////////////////////////////////////////////////////
+    public function getArchivos($usuario) {
+        $archivos = [];
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
 
-    //CODIGO
+        $stmt_archivo->bind_param("i",$usuario);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+        if ( $result ){
+            while ( $archivo = $result->fetch_object('archivo') ){
+                $archivos[]= $archivo;
+            }
+        }
+        return $archivos;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -72,6 +85,20 @@ class AccesoDatosArchivo {
     //Validacion /////////////////////////////////////////////////////////////////////////////
 
     //CODIGO
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    //Eliminacion ////////////////////////////////////////////////////////////////////////////
+    public function eliminaArchivos($usuario) {
+        $stmt_archivo = $this->dbh->prepare("DELETE FROM archivos WHERE usuario = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("i",$usuario);
+        $stmt_archivo->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////
     

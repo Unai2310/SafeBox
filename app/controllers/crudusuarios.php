@@ -246,6 +246,23 @@ function crudManejarCuenta() {
     include_once "app/views/manejacuenta.php";
 }
 
+function crudBorrarCuenta() {
+    checkCSRF();
+    $db = AccesoDatos::getModelo();
+    $dba = AccesoDatosArchivo::getModelo();
+    $archivosBorrar = $dba->getArchivos($_SESSION["id"]);
+    foreach ($archivosBorrar as $value) {
+        unlink(RUTARCHIVOS."/".$value->nombre);
+    }
+    unset($value);
+    $dba->eliminaArchivos($_SESSION["id"]);
+    $db->eliminarUsuario($_SESSION["id"]);
+    AccesoDatos::closeModelo();
+    AccesoDatosArchivo::closeModelo();
+    session_destroy();
+    header("Location: ./");
+}
+
 function crudrevalidarUsuario() {
     $db = AccesoDatos::getModelo();
     $eml = $db->getEmail($_GET["id"]);
