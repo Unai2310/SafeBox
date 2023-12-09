@@ -74,6 +74,72 @@ class AccesoDatosArchivo {
         return $archivos;
     }
 
+    public function getArchivosOldest($usuario) {
+        $archivos = [];
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("i",$usuario);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+        if ( $result ){
+            while ( $archivo = $result->fetch_object('archivo') ){
+                $archivos[]= $archivo;
+            }
+        }
+        return $archivos;
+    }
+
+    public function getArchivosNewest($usuario) {
+        $archivos = [];
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5 DESC");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("i",$usuario);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+        if ( $result ){
+            while ( $archivo = $result->fetch_object('archivo') ){
+                $archivos[]= $archivo;
+            }
+        }
+        return $archivos;
+    }
+
+    public function getEspacioUsado($id) {
+        $espacio = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT sum(tamanio) FROM archivos where usuario = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("i",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+
+        if ( $result ){
+            $espacio = $result->fetch_row();
+        }
+
+        return $espacio;
+    }
+
+    public function getnumFicheros($id) {
+        $num = "";
+
+        $stmt_usuario = $this->dbh->prepare("SELECT count(id) FROM archivos where usuario = ?");
+        if ( $stmt_usuario == false) die ($this->dbh->error);
+        
+        $stmt_usuario->bind_param("i",$id);
+        $stmt_usuario->execute();
+        $result = $stmt_usuario->get_result();
+        
+        if ( $result ){
+            $num = $result->fetch_row();
+        }
+
+        return $num;
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////
 
     //Activacion /////////////////////////////////////////////////////////////////////////////

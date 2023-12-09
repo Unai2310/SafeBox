@@ -7,3 +7,4 @@ define('EMAIL',$_SERVER["IMIEL"]);
 define('EMAILPWD',$_SERVER["CONTRAIMIEL"]);
 define('RUTARCHIVOS',$_SERVER["RUTA"]);
 define('RUTABORRADO',$_SERVER["BORRADO"]);
+define('URL',$_SERVER["URLBASE"]);

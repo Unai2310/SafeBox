@@ -222,8 +222,11 @@ function crudPostCambiarInfo() {
         $accion = "Cambiar";
         include_once "app/views/twophaseform.php";
     } else {
+        $dba = AccesoDatosArchivo::getModelo();
         $email=$_SESSION["email"];
         $nopwd="No pudes dejar este campo vacio";
+        $espacio = getMegas($dba->getEspacioUsado($_SESSION["id"])[0]);
+        $nofich = $dba->getnumFicheros($_SESSION["id"])[0];
         include_once "app/views/manejacuenta.php";
     }
     
@@ -242,8 +245,72 @@ function crudRecuperarContraseña() {
 
 function crudManejarCuenta() {
     checkCSRF();
+    $dba = AccesoDatosArchivo::getModelo();
     $email = $_SESSION["email"];
+    $espacio = getMegas($dba->getEspacioUsado($_SESSION["id"])[0]);
+    $nofich = $dba->getnumFicheros($_SESSION["id"])[0];
     include_once "app/views/manejacuenta.php";
+}
+
+function crudVistaArchivos() {
+    checkCSRF();
+    $dba = AccesoDatosArchivo::getModelo();
+    if ($_GET["order"] == "oldest") {
+        $archivosBorrar = $dba->getArchivosOldest($_SESSION["id"]);
+        $vistatodo = "";
+        $previewfoto = ["image/png", "image/jpeg", "image/gif"];
+        $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
+        foreach ($archivosBorrar as $value) {
+            if (in_array($value->tipoArchivo, $previewfoto)) {
+                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+            } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+            } else {
+                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+            }
+            $vistatodo .= 
+            "<div class='columnasvista'>
+                <a target='_blank'  href='".URL.$value->nombre."'>
+                    ".$preview."
+                </a> 
+                <br> 
+                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombre."</a>
+                <p> ".getFechaFancy($value->fechaSubida)."</p>
+                <p> ".getMegas($value->tamanio)." </p>
+                <input type='checkbox' value='.$value->nombre.' style='display: none;'> 
+            </div>";
+        }
+        include_once "app/views/vista.php";
+    } else if ($_GET["order"] == "newest") {
+        $archivosBorrar = $dba->getArchivosNewest($_SESSION["id"]);
+        $vistatodo = "";
+        $previewfoto = ["image/png", "image/jpeg", "image/gif"];
+        $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
+        foreach ($archivosBorrar as $value) {
+            if (in_array($value->tipoArchivo, $previewfoto)) {
+                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+            } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+            } else {
+                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+            }
+            $vistatodo .= 
+            "<div class='columnasvista'>
+                <a target='_blank'  href='".URL.$value->nombre."'>
+                    ".$preview."
+                </a> 
+                <br> 
+                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombre."</a>
+                <p> ".getFechaFancy($value->fechaSubida)."</p>
+                <p> ".getMegas($value->tamanio)." </p>
+                <input type='checkbox' value='.$value->nombre.' style='display: none;'> 
+            </div>";
+        }
+        include_once "app/views/vista.php";
+    } else {
+        header("Location: ./");
+    }
+    
 }
 
 function crudBorrarCuenta() {

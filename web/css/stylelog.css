@@ -154,6 +154,12 @@ a.botonlink:hover {
 
 }
 
+a#disabled {
+	color: gray;
+	cursor: text;
+	text-decoration: none;
+}
+
 ul {
 	padding: 0;
 }
@@ -198,7 +204,43 @@ ul li.home{
 
 }
 
+.rejilla {
 
+	width: 85%;
+	text-align: center;
+	font-family: "Helvetica";
+	margin: 0 auto;
+}
+
+button.botoncambio {
+	padding: 5px 5px 5px 5px;
+ 	margin: 0px 5px 5px 5px;
+}
+
+.columnasvista {
+	width: 12.5%;
+	min-width: 185px;
+	display: inline-block;
+	margin-top: 15px;
+	padding: 5 15;
+}
+
+.columnasvista > p {
+	font-size: 12px;
+	margin: 0 0;
+}
+
+img.previewimg, video.previewimg {
+
+	max-width: 100%;
+	max-height: 8em;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+video.previewimg {
+    max-width: 100%;
+}
 
 @media screen and (max-device-width: 640px) {
 

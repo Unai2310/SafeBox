@@ -14,7 +14,7 @@
 
     <body style="background-image: url('/safebox/web/resources/texture3.png');">
 
-    <div class="botonInicio">
+        <div class="botonInicio">
             <a class="botonHome" href="./">Inicio</a>
         </div>
         <div class="botonInicio">
@@ -28,8 +28,8 @@
     <div class="notesmall" style="margin-top: 25px;">
 	    
         <h3 style="margin-bottom: 5px;">Uso de Espacio</h3><hr>
-        <p>Space Used:  <?= isset($espacio)?$espacio:'' ?></p>
-        <p>Total Files:  <?= isset($nofich)?$nofich:'' ?></p>
+        <p>Espacio Usado:  <?= isset($espacio)?$espacio:'' ?></p>
+        <p>Archivos Totales:  <?= isset($nofich)?$nofich:'' ?></p>
         <h3 style="margin-bottom: 5px;">Informacion de la cuenta</h3><hr>
 
         <form class="genericform" action="/safebox/" method="post" style="border: 0;">

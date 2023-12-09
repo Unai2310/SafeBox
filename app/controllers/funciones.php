@@ -82,3 +82,20 @@ function sumaHoras($horasumar) {
     $horafinal = $carb->addHours($horasumar);
     return $horafinal;
 }
+
+function getFechaFancy ($fecharaw) {
+    $partes = explode(",", $fecharaw);
+    return $partes[0]."-".$partes[1]."-".$partes[2]." ".$partes[3].":".$partes[4];
+}
+
+function getMegas($bytes, $precision = 2) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+   
+    $bytes = max($bytes, 0); 
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+    $pow = min($pow, count($units) - 1); 
+   
+    $bytes /= (1 << (10 * $pow)); 
+   
+    return round($bytes, $precision) . $units[$pow]; 
+}

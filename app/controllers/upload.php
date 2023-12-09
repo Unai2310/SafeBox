@@ -8,7 +8,7 @@ require_once 'funciones.php';
 $dirdestino = RUTARCHIVOS;
 $dirborrado = RUTABORRADO;
 $respuesta = [];
-$permitidas = ["png", "jpg", "jpeg", "mp3", "mp4", "pdf", "webm", "mkv", "avi", "txt", "json", "xml"];
+$permitidas = ["png", "jpg", "jpeg", "gif", "mp3", "mp4", "pdf", "webm", "mkv", "avi", "txt", "json", "xml"];
 $codigosErrorSubida= [ 
 	UPLOAD_ERR_OK         => 'Subida correcta',  // Valor 0
     UPLOAD_ERR_INI_SIZE   => 'El tamaño del archivo excede el admitido por el servidor',  // directiva upload_max_filesize en php.ini
@@ -30,6 +30,10 @@ $temp=$file['tmp_name'];
 $error=$file['error'];
 
 $fecha=getdate();
+if ($fecha["minutes"] < 10) {
+    $fecha["minutes"] = "0"+$fecha["minutes"];
+}
+$minbien = 
 $fechaString=$fecha["mday"].",".$fecha["mon"].",".$fecha["year"].",".$fecha["hours"].",".$fecha["minutes"];
 
 $respuesta["nombre"] = $file['name'];
