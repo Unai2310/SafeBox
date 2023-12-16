@@ -190,6 +190,12 @@ function crudPostRegistro(){
     if ($us->name == "" || $us->username == "" || $us->email == ""|| $us->pwd == "" || $_POST["reTxtPwd"] == "") {
         $msgnom = "<br><small><b>Hay algun campo vacio, por favor rellenalos todos para poder continuar.</b></small>";
         include_once "app/views/registro.php";
+    } else if (contraSegura($_POST["password"]) != "OK") {
+        $msgpwd = "<br><small><b>".contraSegura($_POST["password"])."</b></small>";
+        $nom = $us->name;
+        $usr = $us->username;
+        $eml = $us->email;
+        include_once "app/views/registro.php";
     } else if ($us->pwd != sha1($_POST["reTxtPwd"])) {
         $msgpwd = "<br><small><b>Las contraseñas no coinciden.</b></small>";
         $nom = $us->name;
@@ -256,54 +262,100 @@ function crudVistaArchivos() {
     checkCSRF();
     $dba = AccesoDatosArchivo::getModelo();
     if ($_GET["order"] == "oldest") {
-        $archivosBorrar = $dba->getArchivosOldest($_SESSION["id"]);
+        $archivos = $dba->getArchivosOldest($_SESSION["id"]);
         $vistatodo = "";
         $previewfoto = ["image/png", "image/jpeg", "image/gif"];
         $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
-        foreach ($archivosBorrar as $value) {
-            if (in_array($value->tipoArchivo, $previewfoto)) {
-                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
-            } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+        
+        foreach ($archivos as $value) {
+            $visibilidad = "";
+            $color = "";
+            if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 0) {
+                $visibilidad = "PRIVADO";
+                $color = "red";
+                if (in_array($value->tipoArchivo, $previewfoto)) {
+                    $preview = "<img class='previewimg' src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'>";
+                } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'></video>";
+                } else if ($value->tipoArchivo == "audio/mpeg") {
+                    $preview = "<audio controls pause><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."' type='audio/mpeg'></audio>";
+                } else {
+                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                }
             } else {
-                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                $visibilidad = "PUBLICO";
+                $color = "green";
+                if (in_array($value->tipoArchivo, $previewfoto)) {
+                    $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+                } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+                } else if ($value->tipoArchivo == "audio/mpeg") {
+                    $preview = "<audio controls pause><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
+                } else {
+                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                }
             }
+            
             $vistatodo .= 
             "<div class='columnasvista'>
                 <a target='_blank'  href='".URL.$value->nombre."'>
                     ".$preview."
                 </a> 
                 <br> 
-                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombre."</a>
+                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
                 <p> ".getFechaFancy($value->fechaSubida)."</p>
                 <p> ".getMegas($value->tamanio)." </p>
-                <input type='checkbox' value='.$value->nombre.' style='display: none;'> 
+                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
+                <input type='checkbox' class='chckbs' value='$value->nombre' style='display: none;'> 
             </div>";
         }
         include_once "app/views/vista.php";
     } else if ($_GET["order"] == "newest") {
-        $archivosBorrar = $dba->getArchivosNewest($_SESSION["id"]);
+        $archivos = $dba->getArchivosNewest($_SESSION["id"]);
         $vistatodo = "";
         $previewfoto = ["image/png", "image/jpeg", "image/gif"];
         $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
-        foreach ($archivosBorrar as $value) {
-            if (in_array($value->tipoArchivo, $previewfoto)) {
-                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
-            } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+        
+        foreach ($archivos as $value) {
+            $visibilidad = "";
+            $color = "";
+            if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 0) {
+                $visibilidad = "PRIVADO";
+                $color = "red";
+                if (in_array($value->tipoArchivo, $previewfoto)) {
+                    $preview = "<img class='previewimg' src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'>";
+                } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'></video>";
+                } else if ($value->tipoArchivo == "audio/mpeg") {
+                    $preview = "<audio controls pause><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."' type='audio/mpeg'></audio>";
+                } else {
+                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                }
             } else {
-                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                $visibilidad = "PUBLICO";
+                $color = "green";
+                if (in_array($value->tipoArchivo, $previewfoto)) {
+                    $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+                } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+                } else if ($value->tipoArchivo == "audio/mpeg") {
+                    $preview = "<audio controls pause><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
+                } else {
+                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+                }
             }
+            
             $vistatodo .= 
             "<div class='columnasvista'>
                 <a target='_blank'  href='".URL.$value->nombre."'>
                     ".$preview."
                 </a> 
                 <br> 
-                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombre."</a>
+                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
                 <p> ".getFechaFancy($value->fechaSubida)."</p>
                 <p> ".getMegas($value->tamanio)." </p>
-                <input type='checkbox' value='.$value->nombre.' style='display: none;'> 
+                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
+                <input type='checkbox' class='chckbs' value='$value->nombre' style='display: none;'> 
             </div>";
         }
         include_once "app/views/vista.php";

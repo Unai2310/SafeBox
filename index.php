@@ -2,7 +2,6 @@
 session_start();
 
 
-
 require_once 'app/helpers/util.php';
 require_once 'app/config/configDB.php';
 require_once 'app/models/usuario.php';

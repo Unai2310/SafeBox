@@ -60,6 +60,30 @@ function regexEmail($email) {
     }
 }
 
+function contraSegura($contra) {
+
+    if (strlen($contra) < 8) {
+        return "La contraseña debe tener 8 caracteres";
+    }
+
+    if (!preg_match('/[A-Z]/', $contra)){
+        return "La contraseña debe tener al menos 1 mayúscula";
+    } 
+
+    if (!preg_match('/[a-z]/', $contra) ) {
+        return "La contraseña debe tener al menos 1 minúscula";
+    }
+
+    if (!preg_match('/[0-9]/', $contra)) {
+        return "La contraseña debe tener al menos 1 número";
+    }
+     if (!preg_match('/[^A-Za-z0-9]/', $contra)) {
+        return "La contraseña debe tener al menos 1 caracyer especial";
+    }
+
+    return "OK";
+}
+
 function createTwoPhase() {
     $abc = "0123456789";
     $cadena = "";
@@ -75,7 +99,6 @@ function checkCSRF(){
         exit();
     }
 }
-
 
 function sumaHoras($horasumar) {
     $carb = Carbon::now('Europe/Madrid');

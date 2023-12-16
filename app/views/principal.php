@@ -36,6 +36,8 @@
 		<br>
 
 		<center> <div class="bienvenida">Almacena de forma segura todos los recursos que quieras</div></center>
+		<br>
+		<center> <div class="bienvenida">El tamaño máximo son 200MB</div></center>
 
 		<br>
 		<br>

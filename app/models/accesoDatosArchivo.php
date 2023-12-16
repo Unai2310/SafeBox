@@ -45,12 +45,12 @@ class AccesoDatosArchivo {
     public function addArchivo($archivo):bool{
 
         $stmt_crearchivo  = $this->dbh->prepare(
-            "INSERT INTO `archivos` (`nombre`, `usuario`, `tipoArchivo`, `fechaSubida`, `visibilidad`, `tamanio`)".
-            "Values(?,?,?,?,?,?)");
+            "INSERT INTO `archivos` (`nombre`, `usuario`, `tipoArchivo`, `fechaSubida`, `visibilidad`, `tamanio`, `nombreog`)".
+            "Values(?,?,?,?,?,?,?)");
         if ( $stmt_crearchivo == false) die ($this->dbh->error);
 
-        $stmt_crearchivo->bind_param("sissis",$archivo->nombre,$archivo->usuario,$archivo->tipoArchivo,$archivo->fechaSubida,
-        $archivo->visibilidad,$archivo->tamanio);
+        $stmt_crearchivo->bind_param("sississ",$archivo->nombre,$archivo->usuario,$archivo->tipoArchivo,$archivo->fechaSubida,
+        $archivo->visibilidad,$archivo->tamanio,$archivo->nombreog);
         $stmt_crearchivo->execute();
         $resu = ($this->dbh->affected_rows == 1);
         return $resu;
@@ -74,9 +74,24 @@ class AccesoDatosArchivo {
         return $archivos;
     }
 
+    public function getVisivilidad($id, $nombre) {
+        $visi = "";
+        $stmt_archivo  = $this->dbh->prepare("SELECT visibilidad FROM archivos WHERE nombre = ? AND usuario = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("si", $nombre, $id);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+        if ( $result ){
+            $visi = $result->fetch_row();
+        }
+
+        return $visi[0];
+    }
+
     public function getArchivosOldest($usuario) {
         $archivos = [];
-        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5");
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5 DESC");
         if ( $stmt_archivo == false) die ($this->dbh->error);
 
         $stmt_archivo->bind_param("i",$usuario);
@@ -92,7 +107,7 @@ class AccesoDatosArchivo {
 
     public function getArchivosNewest($usuario) {
         $archivos = [];
-        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5 DESC");
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5");
         if ( $stmt_archivo == false) die ($this->dbh->error);
 
         $stmt_archivo->bind_param("i",$usuario);
@@ -109,12 +124,12 @@ class AccesoDatosArchivo {
     public function getEspacioUsado($id) {
         $espacio = "";
 
-        $stmt_usuario = $this->dbh->prepare("SELECT sum(tamanio) FROM archivos where usuario = ?");
-        if ( $stmt_usuario == false) die ($this->dbh->error);
+        $stmt_archivo = $this->dbh->prepare("SELECT sum(tamanio) FROM archivos where usuario = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
         
-        $stmt_usuario->bind_param("i",$id);
-        $stmt_usuario->execute();
-        $result = $stmt_usuario->get_result();
+        $stmt_archivo->bind_param("i",$id);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
 
         if ( $result ){
             $espacio = $result->fetch_row();
@@ -126,12 +141,12 @@ class AccesoDatosArchivo {
     public function getnumFicheros($id) {
         $num = "";
 
-        $stmt_usuario = $this->dbh->prepare("SELECT count(id) FROM archivos where usuario = ?");
-        if ( $stmt_usuario == false) die ($this->dbh->error);
+        $stmt_archivo = $this->dbh->prepare("SELECT count(id) FROM archivos where usuario = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
         
-        $stmt_usuario->bind_param("i",$id);
-        $stmt_usuario->execute();
-        $result = $stmt_usuario->get_result();
+        $stmt_archivo->bind_param("i",$id);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
         
         if ( $result ){
             $num = $result->fetch_row();
@@ -142,9 +157,27 @@ class AccesoDatosArchivo {
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    //Activacion /////////////////////////////////////////////////////////////////////////////
+    //Cambio /////////////////////////////////////////////////////////////////////////////
 
-    //CODIGO
+    function cambiarVisibilidad ($id, $valor, $nombre) {
+        $stmt_archivo   = $this->dbh->prepare("UPDATE archivos SET visibilidad = ? WHERE usuario = ? AND nombre = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("iis", $valor, $id, $nombre);
+        $stmt_archivo->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
+    function cambiarNombreFich ($id, $valor, $nombre) {
+        $stmt_archivo   = $this->dbh->prepare("UPDATE archivos SET nombre = ? WHERE usuario = ? AND nombre = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("sis", $valor, $id, $nombre);
+        $stmt_archivo->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +199,16 @@ class AccesoDatosArchivo {
 
     }
 
+    public function eliminaArchivo($usuario, $nombre) {
+        $stmt_archivo = $this->dbh->prepare("DELETE FROM archivos WHERE usuario = ? AND nombre = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("is",$usuario, $nombre);
+        $stmt_archivo->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+
+    }
     //////////////////////////////////////////////////////////////////////////////////////////
     
      // Evito que se pueda clonar el objeto. (SINGLETON)

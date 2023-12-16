@@ -61,6 +61,7 @@ if ($tamanio > 209715200) {
             $archivo->fechaSubida = $fechaString;
             $archivo->visibilidad = 1;
             $archivo->tamanio = $tamanio;
+            $archivo->nombreog = $respuesta["nombreviejo"];
             $db->addArchivo($archivo);
         } else if (isset($_POST['tiempo'])){
             $tiempoborrado = sumaHoras($_POST['tiempo']);

@@ -126,6 +126,14 @@ input[type=button] {
     top: 5px;
 }
 
+input[type="checkbox"] {
+
+	width: 20px;
+	height: 20px;
+	background: #fcfff4;
+	text-align: center;
+}
+
 a.botonHome {
 
 	color: black;
@@ -144,7 +152,6 @@ a.botonlink {
 
 	color: #3F8694;
 	text-decoration: none;
-
 }
 
 a.botonlink:hover {
@@ -223,6 +230,9 @@ button.botoncambio {
 	display: inline-block;
 	margin-top: 15px;
 	padding: 5 15;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .columnasvista > p {

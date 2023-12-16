@@ -8,6 +8,7 @@ class Archivo {
     private $fechaSubida;
     private $visibilidad;
     private $tamanio;
+    private $nombreog;
     
     function __set($name, $value)
    {
