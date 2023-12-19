@@ -239,6 +239,57 @@ function crudPostCambiarInfo() {
     
 }
 
+function crudEnviarArchivos() {
+    checkCSRF();
+    $dba = AccesoDatosArchivo::getModelo();
+    $previewfoto = ["image/png", "image/jpeg", "image/gif"];
+    $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
+    if ($_GET["order"] == "oldest") {
+        $archivos = $dba->getArchivosOldest($_SESSION["id"]);
+        $vistatodo = "";
+    } else if ($_GET["order"] == "newest") {
+        $archivos = $dba->getArchivosNewest($_SESSION["id"]);
+        $vistatodo = "";  
+    } else {
+        header("Location: ./");
+    }
+    foreach ($archivos as $value) {
+        $visibilidad = "";
+        $color = "";
+        if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 1) {
+            $visibilidad = "PUBLICO";
+            $color = "green";
+            $datosAtag = "href='".URL.$value->nombre."'";
+            if (in_array($value->tipoArchivo, $previewfoto)) {
+                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+            } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+            } else if ($value->tipoArchivo == "audio/mpeg") {
+                $preview = "<audio controls><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
+            } else {
+                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+            }
+
+            $vistatodo .= 
+            "<div class='columnasvista'>
+                <a target='_blank' $datosAtag>
+                    ".$preview."
+                </a> 
+                <br> 
+                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
+                <p> ".getFechaFancy($value->fechaSubida)."</p>
+                <p> ".getMegas($value->tamanio)." </p>
+                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
+                <input type='checkbox' class='chckbs' value='$value->nombre'> 
+            </div>";
+        }
+    }
+    if (count($archivos) == 0) {
+        $vistatodo = "<h1>No hay archivos públicos disponibles para enviar</h1>";
+    }
+    include_once "app/views/envio.php";
+}
+
 function crudRecuperarContraseña() {
     $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
     Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
@@ -261,108 +312,62 @@ function crudManejarCuenta() {
 function crudVistaArchivos() {
     checkCSRF();
     $dba = AccesoDatosArchivo::getModelo();
+    $previewfoto = ["image/png", "image/jpeg", "image/gif"];
+    $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
     if ($_GET["order"] == "oldest") {
         $archivos = $dba->getArchivosOldest($_SESSION["id"]);
         $vistatodo = "";
-        $previewfoto = ["image/png", "image/jpeg", "image/gif"];
-        $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
-        
-        foreach ($archivos as $value) {
-            $visibilidad = "";
-            $color = "";
-            if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 0) {
-                $visibilidad = "PRIVADO";
-                $color = "red";
-                if (in_array($value->tipoArchivo, $previewfoto)) {
-                    $preview = "<img class='previewimg' src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'>";
-                } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'></video>";
-                } else if ($value->tipoArchivo == "audio/mpeg") {
-                    $preview = "<audio controls pause><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."' type='audio/mpeg'></audio>";
-                } else {
-                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
-                }
-            } else {
-                $visibilidad = "PUBLICO";
-                $color = "green";
-                if (in_array($value->tipoArchivo, $previewfoto)) {
-                    $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
-                } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
-                } else if ($value->tipoArchivo == "audio/mpeg") {
-                    $preview = "<audio controls pause><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
-                } else {
-                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
-                }
-            }
-            
-            $vistatodo .= 
-            "<div class='columnasvista'>
-                <a target='_blank'  href='".URL.$value->nombre."'>
-                    ".$preview."
-                </a> 
-                <br> 
-                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
-                <p> ".getFechaFancy($value->fechaSubida)."</p>
-                <p> ".getMegas($value->tamanio)." </p>
-                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
-                <input type='checkbox' class='chckbs' value='$value->nombre' style='display: none;'> 
-            </div>";
-        }
-        include_once "app/views/vista.php";
     } else if ($_GET["order"] == "newest") {
         $archivos = $dba->getArchivosNewest($_SESSION["id"]);
-        $vistatodo = "";
-        $previewfoto = ["image/png", "image/jpeg", "image/gif"];
-        $previewvideo = ["video/mp4", "video/webm", "video/x-matroska", "video/x-msvideo"];
-        
-        foreach ($archivos as $value) {
-            $visibilidad = "";
-            $color = "";
-            if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 0) {
-                $visibilidad = "PRIVADO";
-                $color = "red";
-                if (in_array($value->tipoArchivo, $previewfoto)) {
-                    $preview = "<img class='previewimg' src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'>";
-                } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."'></video>";
-                } else if ($value->tipoArchivo == "audio/mpeg") {
-                    $preview = "<audio controls pause><source src='app/helpers/send_file.php?name=".$value->nombre."&csrf=".$_SESSION['token']."&type=".$value->tipoArchivo."' type='audio/mpeg'></audio>";
-                } else {
-                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
-                }
-            } else {
-                $visibilidad = "PUBLICO";
-                $color = "green";
-                if (in_array($value->tipoArchivo, $previewfoto)) {
-                    $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
-                } else if(in_array($value->tipoArchivo, $previewvideo)) {
-                    $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
-                } else if ($value->tipoArchivo == "audio/mpeg") {
-                    $preview = "<audio controls pause><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
-                } else {
-                    $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
-                }
-            }
-            
-            $vistatodo .= 
-            "<div class='columnasvista'>
-                <a target='_blank'  href='".URL.$value->nombre."'>
-                    ".$preview."
-                </a> 
-                <br> 
-                <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
-                <p> ".getFechaFancy($value->fechaSubida)."</p>
-                <p> ".getMegas($value->tamanio)." </p>
-                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
-                <input type='checkbox' class='chckbs' value='$value->nombre' style='display: none;'> 
-            </div>";
-        }
-        include_once "app/views/vista.php";
+        $vistatodo = "";  
     } else {
         header("Location: ./");
     }
-    
+    foreach ($archivos as $value) {
+        $visibilidad = "";
+        $color = "";
+        if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 0) {
+            $visibilidad = "PRIVADO";
+            $color = "red";
+            $datosAtag = "href='".URL.$value->nombre."'";
+            if (in_array($value->tipoArchivo, $previewfoto)) {
+                $preview = "<img class='previewimg' src='app/helpers/send_file.php?name=".$value->nombre."&csrf=CAMBIO&type=".$value->tipoArchivo."'>";  
+            } else {
+                $datosAtag = "class='cambiocsrf' href='app/helpers/send_file.php?name=".$value->nombre."&csrf=CAMBIO&type=".$value->tipoArchivo."'";
+                $preview = "<img class='previewimg' src='/safebox/web/resources/previewprivada.png' alt='Haz click Para Ver El Archivo'>";
+            }
+        } else {
+            $visibilidad = "PUBLICO";
+            $color = "green";
+            $datosAtag = "href='".URL.$value->nombre."'";
+            if (in_array($value->tipoArchivo, $previewfoto)) {
+                $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
+            } else if(in_array($value->tipoArchivo, $previewvideo)) {
+                $preview = "<video class='previewimg' preload='metadata' controls=''><source src='".URL.$value->nombre."'></video>";
+            } else if ($value->tipoArchivo == "audio/mpeg") {
+                $preview = "<audio controls><source src='".URL.$value->nombre."' type='audio/mpeg'></audio>";
+            } else {
+                $preview = "<img class='previewimg' src='/safebox/web/resources/nopreview.png'>";
+            }
+        }
+        
+        $vistatodo .= 
+        "<div class='columnasvista'>
+            <a target='_blank' $datosAtag>
+                ".$preview."
+            </a> 
+            <br> 
+            <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
+            <p> ".getFechaFancy($value->fechaSubida)."</p>
+            <p> ".getMegas($value->tamanio)." </p>
+            <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
+            <input type='checkbox' class='chckbs' value='$value->nombre' style='display: none;'> 
+        </div>";
+    }
+    if (count($archivos) == 0) {
+        $vistatodo = "<h1>Esta cuenta no tiene archivos subidos</h1>";
+    }
+    include_once "app/views/vista.php";
 }
 
 function crudBorrarCuenta() {
@@ -371,7 +376,11 @@ function crudBorrarCuenta() {
     $dba = AccesoDatosArchivo::getModelo();
     $archivosBorrar = $dba->getArchivos($_SESSION["id"]);
     foreach ($archivosBorrar as $value) {
-        unlink(RUTARCHIVOS."/".$value->nombre);
+        if ($value->visibilidad == 0) {
+            unlink(RUTAPRIVADA."/".$value->nombre);
+        } else {
+            unlink(RUTARCHIVOS."/".$value->nombre);
+        }
     }
     unset($value);
     $dba->eliminaArchivos($_SESSION["id"]);

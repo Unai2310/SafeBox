@@ -13,6 +13,11 @@ if (isset($_GET["type"])) {
         case "video/webm"       : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break;
         case "video/x-matroska" : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break;
         case "video/x-msvideo"  : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break;
+        case "audio/mpeg"       : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break; 
+        case "application/pdf"  : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break; 
+        case "text/plain"       : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break; 
+        case "application/json" : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break; 
+        case "application/xml"  : header("Content-Type: ".$_GET['type']); readfile(RUTAPRIVADA."/".$_GET["name"]); break;  
     }
 }
 ?>

@@ -171,6 +171,12 @@ ul {
 	padding: 0;
 }
 
+ul#listacorreos {
+	padding: 0;
+	list-style-type: none;
+	font-size: 15px;
+}
+
 ul li.home{
 
 	width: 25%;
@@ -229,7 +235,7 @@ button.botoncambio {
 	min-width: 185px;
 	display: inline-block;
 	margin-top: 15px;
-	padding: 5 15;
+	padding: 5px 15px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;

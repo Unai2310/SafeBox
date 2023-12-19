@@ -22,27 +22,31 @@
         </div>
 
         <header>
-        <div class="bienvenida">Vista de Archivos</div>
+        <div class="bienvenida">Envio de Archivos</div>
         </header>
 
         <br>
 
         <div class="notesmall">
-            <p>Todos los archivos subidos por <b><?= isset($_SESSION["username"])?$_SESSION["username"]:'' ?></b>
+            <p>Selecciona los archivos que quieras enviar
             <p style="font-size: 16px;">Ordenar por: 
-            <a href="?orden=vista&order=oldest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>" class="botonlink">Viejo</a> 
-            <a href="?orden=vista&order=newest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>" class="botonlink">Nuevo</a>
+            <a href="?orden=envio&order=oldest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>" class="botonlink">Viejo</a> 
+            <a href="?orden=envio&order=newest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>" class="botonlink">Nuevo</a>
             </p></p>
 
-            <p id="seleccionatext" style="margin-bottom: 5px;">Selecciona para...</p>
+            <p id="seleccionatext" style="margin-bottom: 5px;">Indica los correos de destino</p>
 
-            <button class="botoncambio" id="cambio" onclick="editarArchivos(1)">Cambiar Acceso</button>
-
-            <button class="botoncambio" id="borrado" onclick="editarArchivos(2)">Borrar</button>
+            <input id="txtCorreo" class="stylized" type="text">
+            <button class="botoncambio" id="cambio" onclick="return aniadirCorreo()">Añadir Correo</button>
+            <ul id="listacorreos">
+                
+            </ul>
+            <hr>
+            <button class="botoncambio" id="borrado" onclick="">Enviar Seleccionados</button>
 
             <input type="hidden" id="csrftoken" value="<?=$_SESSION['token']?>">
 
-            <p style="font-size: 14px; display: none;" class="opcioneseleccion" id="opselec">
+            <p style="font-size: 14px;" class="opcioneseleccion" id="opselec">
                 <a href="#" class="botonlink" id="seltodo" onclick="selTodo()">Seleccionar Todo </a> 
                 <a href="#" class="botonlink" id="selnada" onclick="selNada()"> Deseleccionar Todo</a>
             </p>

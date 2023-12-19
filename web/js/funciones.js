@@ -25,6 +25,35 @@ function confirmarBorrar(nombre,csrf){
     }
 }
 
+function eliminarCorreo(elemento) {
+    var id=elemento.parentNode.getAttribute("id");
+    node=document.getElementById(id);
+    node.parentNode.removeChild(node);
+}
+
+function aniadirCorreo() {
+    var correo=document.getElementById("txtCorreo").value;
+    if(correo.length>0) {
+        if(find_li(correo) && /^([a-zA-Z0-9_@.#&+-\.]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/.test(correo)) {
+            var li=document.createElement('li');
+            li.id=correo;
+            li.innerHTML="<span id="+correo+"> "+correo+" <img src='/safebox/web/resources/Borrar.ico' width='16px' heigth='16px' onclick='eliminarCorreo(this)'></span>";
+            document.getElementById("listacorreos").appendChild(li);
+        }
+    }
+    document.getElementById("txtCorreo").value = "";
+    return false;
+}
+   
+function find_li(contenido) {
+    var el = document.getElementById("listacorreos").getElementsByTagName("li");
+    for (var i=0; i<el.length; i++) {
+        if(el[i].id==contenido)
+            return false;
+    }
+    return true;
+}
+
 function cambiarVisibilidad() {
     if (confirm("¿Quieres cambiar la visibilidad los archivos marcados?")) {
         let chkbs = document.getElementsByClassName("chckbs");
@@ -43,6 +72,7 @@ function cambiarVisibilidad() {
             method: 'POST',
             body: fileData
         }).then(res => res.json()).then(data => {
+            //console.log(data)
             const obj = JSON.parse(JSON.stringify(data));
             document.location.href="?orden=vista&order=oldest&csrf="+obj.csrf;
         })
@@ -128,6 +158,24 @@ function selNada() {
     }
 }
 
+function cambioCSRF() {
+    let csrf = document.getElementById("csrftoken");
+
+    let imgs = document.getElementsByTagName("img");
+    for(i=0;i<imgs.length;i++) {
+        let urlimg = imgs[i].src;
+        if (urlimg.indexOf("CAMBIO") != -1) {
+            imgs[i].src = urlimg.replace("CAMBIO", csrf.value);
+        }
+    }
+
+    let vidsmp3 = document.getElementsByClassName("cambiocsrf");
+    for(i=0;i<vidsmp3.length;i++) {
+        let urlmal = vidsmp3[i].href;
+        vidsmp3[i].href = urlmal.replace("CAMBIO", csrf.value);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById('dropzoneSubida')) {
         let myDropzone = new Dropzone('.dropzone', {
@@ -163,14 +211,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         navigator.clipboard.writeText("https://flo.no-ip.info/uploads/"+copiar);
                         //navigator.clipboard.writeText("http://localhost/uploads/"+copiar);
                     });
-                    spanbueno.addEventListener("mouseover",(event) => {
-                        let textog = spanbueno.textContent;
-                        spanbueno.textContent = "HAZ CLICK PARA COPIAR";
-                        setTimeout(() => {
-                            spanbueno.textContent = textog;
-                        }, 1000);
-                        },
-                        false,);
                 } else {
                     alert(obj.error);
                     myDropzone.removeFile(file);

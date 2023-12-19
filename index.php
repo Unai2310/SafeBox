@@ -24,6 +24,7 @@ if (isset($_GET["orden"])) {
         case "recuperar"    : crudRecuperarContraseña(); break;
         case "borrar"       : crudBorrarCuenta(); break;
         case "vista"        : crudVistaArchivos(); break;
+        case "envio"        : crudEnviarArchivos(); break;
         
     }
 } else  if (isset($_POST["orden"])){

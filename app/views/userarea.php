@@ -31,7 +31,7 @@
 
         <center><ul>
             <li class="home"><a class ="botonlink" href="?orden=vista&order=oldest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>">Ver Archivos</a></li>
-            <li class="home"><a class ="botonlink" href="manage_albums.php">Gestionar Albumes</a></li>
+            <li class="home"><a class ="botonlink" href="?orden=envio&order=oldest&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>">Enviar Archivos</a></li>
             <li class="home"><a class ="botonlink" href="?orden=cuenta&csrf=<?= isset($_SESSION["token"])?$_SESSION["token"]:'' ?>">Gestionar Cuenta</a></li>
         </ul></center>
 
