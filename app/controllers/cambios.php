@@ -52,7 +52,7 @@ if ($_POST['file'] > 0) {
             $codigo .= " <p><a href='https://flo.no-ip.info/uploads/".$archivo->nombre."' class='btn'>".$archivo->nombre."</a></p>";
         }
         
-        $html = file_get_contents("/home/unai/safebox/app/views/bodycorreocompartir.html");
+        $html = file_get_contents(RUTAHOME."safebox/app/views/bodycorreocompartir.html");
         $partes = explode("&",$html);
         $htmlcompleto = $partes[0]."$codigo".$partes[1];
         $destinatarios = $validemails;

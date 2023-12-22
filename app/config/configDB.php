@@ -9,3 +9,4 @@ define('RUTARCHIVOS',$_SERVER["RUTA"]);
 define('RUTAPRIVADA', $_SERVER["RUTAPRIV"]);
 define('RUTABORRADO',$_SERVER["BORRADO"]);
 define('URL',$_SERVER["URLBASE"]);
+define('RUTAHOME',$_SERVER["RUTAHOME"]);
