@@ -74,6 +74,19 @@ class AccesoDatosArchivo {
         return $archivos;
     }
 
+    public function getArchivo($id) {
+        $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE id = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+
+        $stmt_archivo->bind_param("i",$id);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+        if ( $result ){
+            $archivo = $result->fetch_object('archivo');
+        }
+        return $archivo;
+    }
+
     public function getVisivilidad($id, $nombre) {
         $visi = "";
         $stmt_archivo  = $this->dbh->prepare("SELECT visibilidad FROM archivos WHERE nombre = ? AND usuario = ?");

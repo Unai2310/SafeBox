@@ -42,7 +42,7 @@
                 
             </ul>
             <hr>
-            <button class="botoncambio" id="borrado" onclick="">Enviar Seleccionados</button>
+            <button class="botoncambio" id="borrado" onclick="enviarArchivos()">Enviar Seleccionados</button>
 
             <input type="hidden" id="csrftoken" value="<?=$_SESSION['token']?>">
 

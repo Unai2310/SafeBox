@@ -39,7 +39,12 @@ function aniadirCorreo() {
             li.id=correo;
             li.innerHTML="<span id="+correo+"> "+correo+" <img src='/safebox/web/resources/Borrar.ico' width='16px' heigth='16px' onclick='eliminarCorreo(this)'></span>";
             document.getElementById("listacorreos").appendChild(li);
+            document.getElementById("txtCorreo").style.borderColor = "#142c3c";
+        } else {
+            document.getElementById("txtCorreo").style.borderColor = "#a33232";
         }
+    } else {
+        document.getElementById("txtCorreo").style.borderColor = "#a33232";
     }
     document.getElementById("txtCorreo").value = "";
     return false;
@@ -54,52 +59,93 @@ function find_li(contenido) {
     return true;
 }
 
-function cambiarVisibilidad() {
-    if (confirm("¿Quieres cambiar la visibilidad los archivos marcados?")) {
-        let chkbs = document.getElementsByClassName("chckbs");
-        let token = document.getElementById("csrftoken").value;
-        let marcados = [];
-        for(i=0;i<chkbs.length;i++) {
-            if (chkbs[i].checked == true) {
-                marcados.push(chkbs[i].value);
-            }
+function enviarArchivos() {
+    let correos = document.getElementById("listacorreos").getElementsByTagName("li");
+    let chkbs = document.getElementsByClassName("chckbs");
+    let marcados = [];
+    let marcadosemail = [];
+    for(i=0;i<chkbs.length;i++) {
+        if (chkbs[i].checked == true) {
+            marcados.push(chkbs[i].value);
         }
-        let fileData = new FormData();
-        fileData.append('file', marcados);
-        fileData.append('csrf', token);
-        fileData.append('op', "cambio");
-        fetch('/safebox/app/controllers/cambios.php', {
-            method: 'POST',
-            body: fileData
-        }).then(res => res.json()).then(data => {
-            //console.log(data)
-            const obj = JSON.parse(JSON.stringify(data));
-            document.location.href="?orden=vista&order=oldest&csrf="+obj.csrf;
-        })
+    }
+    for(i=0;i<correos.length;i++) {
+        marcadosemail.push(correos[i].id);
+    }
+    if (marcados.length > 0 && marcadosemail.length > 0) {
+        if (confirm("¿Quieres enviar los archivos marcados a los destinatarios indicados?")) {
+            let token = document.getElementById("csrftoken").value;
+            let fileData = new FormData();
+            fileData.append('file', marcados);
+            fileData.append('email', marcadosemail);
+            fileData.append('csrf', token);
+            fileData.append('op', "envio");
+            fetch('/safebox/app/controllers/cambios.php', {
+                method: 'POST',
+                body: fileData
+            }).then(res => res.json()).then(data => {
+                alert("Correo Enviado con exito");
+            })
+        }
+    } else {
+        alert("No hay indicados archivos o destinatarios");
+    }
+}
+
+function cambiarVisibilidad() {
+    let chkbs = document.getElementsByClassName("chckbs");
+    let marcados = [];
+    for(i=0;i<chkbs.length;i++) {
+        if (chkbs[i].checked == true) {
+            marcados.push(chkbs[i].value);
+        }
+    }
+    if (marcados.length > 0) {
+        if (confirm("¿Quieres cambiar la visibilidad los archivos marcados?")) {
+            let token = document.getElementById("csrftoken").value;
+            let fileData = new FormData();
+            fileData.append('file', marcados);
+            fileData.append('csrf', token);
+            fileData.append('op', "cambio");
+            fetch('/safebox/app/controllers/cambios.php', {
+                method: 'POST',
+                body: fileData
+            }).then(res => res.json()).then(data => {
+                //console.log(data)
+                const obj = JSON.parse(JSON.stringify(data));
+                document.location.href="?orden=vista&order=oldest&csrf="+obj.csrf;
+            })
+        }
+    } else {
+        alert("No hay archivos marcados");
     }
 }
 
 function borrarArchivos() {
-    if (confirm("¿Quieres seguro eliminar los archivos marcados?")) {
-        let chkbs = document.getElementsByClassName("chckbs");
-        let token = document.getElementById("csrftoken").value;
-        let marcados = [];
-        for(i=0;i<chkbs.length;i++) {
-            if (chkbs[i].checked == true) {
-                marcados.push(chkbs[i].value);
-            }
+    let chkbs = document.getElementsByClassName("chckbs");
+    let marcados = [];
+    for(i=0;i<chkbs.length;i++) {
+        if (chkbs[i].checked == true) {
+            marcados.push(chkbs[i].value);
         }
-        let fileData = new FormData();
-        fileData.append('file', marcados);
-        fileData.append('csrf', token);
-        fileData.append('op', "borrado");
-        fetch('/safebox/app/controllers/cambios.php', {
-            method: 'POST',
-            body: fileData
-        }).then(res => res.json()).then(data => {
-            const obj = JSON.parse(JSON.stringify(data));
-            document.location.href="?orden=vista&order=oldest&csrf="+obj.csrf;
-        })
+    }
+    if (marcados.length > 0) {
+        if (confirm("¿Quieres seguro eliminar los archivos marcados?")) {
+            let token = document.getElementById("csrftoken").value;
+            let fileData = new FormData();
+            fileData.append('file', marcados);
+            fileData.append('csrf', token);
+            fileData.append('op', "borrado");
+            fetch('/safebox/app/controllers/cambios.php', {
+                method: 'POST',
+                body: fileData
+            }).then(res => res.json()).then(data => {
+                const obj = JSON.parse(JSON.stringify(data));
+                document.location.href="?orden=vista&order=oldest&csrf="+obj.csrf;
+            })
+        } 
+    } else {
+        alert("No hay archivos marcados");
     }
 }
 

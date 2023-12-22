@@ -9,7 +9,6 @@ require_once __DIR__."/../composer/vendor/autoload.php";
 
 function enviarCorreo($correo, $subject, $body) {
     $mail = new PHPMailer(true);
-    $db = AccesoDatos::getModelo();
 
     try {
         //Server settings
@@ -24,12 +23,15 @@ function enviarCorreo($correo, $subject, $body) {
 
         //Recipients
         $mail->setFrom('safebox074@gmail.com', 'Equipo de Safebox');
-        $mail->addAddress($correo, 'SafeBox');    
+        foreach ($correo as &$value) {
+            $mail->addAddress($value, 'SafeBox');  
+        }
+          
 
         //Content
         $mail->isHTML(true);                                  
-        $mail->Subject = $subject;//'Bienvenido a SafeBox';
-        $mail->Body = $body;//getHtmlBody($db->getId($correo), $token);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
 
         $mail->send();
     } catch (Exception $e) {

@@ -11,7 +11,7 @@ if ($_POST['file'] > 0) {
     $dirpublica = RUTARCHIVOS;
     $dirprivada = RUTAPRIVADA;
 
-    $archivos =explode(",", $_POST['file']);
+    $archivos = explode(",", $_POST['file']);
 
     $db = AccesoDatosArchivo::getModelo();
 
@@ -38,6 +38,25 @@ if ($_POST['file'] > 0) {
                 unlink(RUTARCHIVOS."/".$value);
             }
         }
-    }   
+    } else if ($_POST['op'] == "envio") {
+        $emails = explode(",", $_POST['email']);
+        $validemails = [];
+        foreach ($emails as &$value) {
+            if (!regexEmail($value)) {
+                array_push($validemails, $value);
+            }
+        }
+        $codigo = "<strong>".$_SESSION["username"]."</strong> desde su cuenta de <strong>SafeBox</strong> quiere compartir contigo estos archivos</p>";
+        foreach ($archivos as &$value) {
+            $archivo = $db->getArchivo($value);
+            $codigo .= " <p><a href='https://flo.no-ip.info/uploads/".$archivo->nombre."' class='btn'>".$archivo->nombre."</a></p>";
+        }
+        
+        $html = file_get_contents("/home/unai/safebox/app/views/bodycorreocompartir.html");
+        $partes = explode("&",$html);
+        $htmlcompleto = $partes[0]."$codigo".$partes[1];
+        $destinatarios = $validemails;
+        enviarCorreo($destinatarios,"Envio de Ficheros", $htmlcompleto);
+    }
 }
 echo json_encode($_POST);

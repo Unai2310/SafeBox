@@ -29,7 +29,8 @@ function crudPostIngreso(){
                 $html = file_get_contents("app/views/bodycorreoverificar.html");
                 $partes = explode("&",$html);
                 $htmlcompleto = $partes[0]."$codigo".$partes[1];
-                enviarCorreo($us->email,"Verificacion en 2 pasos", $htmlcompleto);
+                $destinatarios = [$us->email];
+                enviarCorreo($destinatarios,"Verificacion en 2 pasos", $htmlcompleto);
                 $accion = "Verificar";
                 include_once "app/views/twophaseform.php";
             } else {
@@ -139,7 +140,8 @@ function crudPostRecuperarPwd() {
         $htmlcompleto = $partes[0]."$codigosincifrar".$partes[1];
         $idus = $db->getId($_POST['codigo'])[0];
         $db->modPwd($idus, $codigo);
-        enviarCorreo($_POST['codigo'],"Recuperacion de Contraseña", $htmlcompleto);
+        $destinatarios = [$_POST['codigo']];
+        enviarCorreo($destinatarios,"Recuperacion de Contraseña", $htmlcompleto);
         AccesoDatos::closeModelo();
         session_destroy();
         header("Location: ./?orden=login");
@@ -205,7 +207,8 @@ function crudPostRegistro(){
     } else {
         $db->addUsuario($us);
         $eml = $us->email;
-        enviarCorreo($eml, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml), $us->token));
+        $destinatarios = [$eml];
+        enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml), $us->token));
         include_once "app/views/postregistro.php";
     }
 }
@@ -223,7 +226,8 @@ function crudPostCambiarInfo() {
         $html = file_get_contents("app/views/bodycorreocambiarpwd.html");
         $partes = explode("&",$html);
         $htmlcompleto = $partes[0]."$codigo".$partes[1];
-        enviarCorreo($_SESSION["email"],"Cambio de Contrseña", $htmlcompleto);
+        $destinatarios = [$_SESSION["email"]];
+        enviarCorreo($destinatarios,"Cambio de Contrseña", $htmlcompleto);
         $_SESSION["cambiopwd"] = sha1($_POST["password"]);
         $accion = "Cambiar";
         include_once "app/views/twophaseform.php";
@@ -280,7 +284,7 @@ function crudEnviarArchivos() {
                 <p> ".getFechaFancy($value->fechaSubida)."</p>
                 <p> ".getMegas($value->tamanio)." </p>
                 <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
-                <input type='checkbox' class='chckbs' value='$value->nombre'> 
+                <input type='checkbox' class='chckbs' value='$value->id'> 
             </div>";
         }
     }
@@ -395,7 +399,8 @@ function crudrevalidarUsuario() {
     $db = AccesoDatos::getModelo();
     $eml = $db->getEmail($_GET["id"]);
     $token = $db->getToken($_GET["id"]);
-    enviarCorreo($eml, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml),$token));
+    $destinatarios = [$eml];
+    enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml),$token));
     include_once "app/views/postregistro.php";
 }
 
@@ -412,7 +417,8 @@ function crudActivar() {
     $html = file_get_contents("app/views/bodycorreoverificar.html");
     $partes = explode("&",$html);
     $htmlcompleto = $partes[0]."$codigo".$partes[1];
-    enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
+    $destinatarios = [$_SESSION["email"]];
+    enviarCorreo($destinatarios,"Verificacion en 2 pasos", $htmlcompleto);
     include_once "app/views/twophaseform.php";
 }
 
@@ -430,7 +436,8 @@ function cruddesactivar() {
     $html = file_get_contents("app/views/bodycorreoverificar.html");
     $partes = explode("&",$html);
     $htmlcompleto = $partes[0]."$codigo".$partes[1];
-    enviarCorreo($_SESSION["email"],"Verificacion en 2 pasos", $htmlcompleto);
+    $destinatarios = [$_SESSION["email"]];
+    enviarCorreo($destinatarios,"Verificacion en 2 pasos", $htmlcompleto);
     include_once "app/views/twophaseform.php";
 }
 
