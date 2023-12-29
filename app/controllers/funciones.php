@@ -80,7 +80,7 @@ function contraSegura($contra) {
         return "La contraseña debe tener al menos 1 número";
     }
      if (!preg_match('/[^A-Za-z0-9]/', $contra)) {
-        return "La contraseña debe tener al menos 1 caracyer especial";
+        return "La contraseña debe tener al menos 1 caracter especial";
     }
 
     return "OK";
@@ -110,6 +110,14 @@ function sumaHoras($horasumar) {
 
 function getFechaFancy ($fecharaw) {
     $partes = explode(",", $fecharaw);
+    if ($partes[3] < 10) {
+        $partes[3] = "0".$partes[3];
+    }
+
+    if ($partes[4] < 10) {
+        $partes[4] = "0".$partes[4];
+    }
+    
     return $partes[0]."-".$partes[1]."-".$partes[2]." ".$partes[3].":".$partes[4];
 }
 

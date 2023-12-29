@@ -8,6 +8,7 @@
 			$_SESSION["username"] = $us->username;
 			$_SESSION["email"] = $us->email;
 			$_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
+			$_SESSION["loginstatus"] = "Logeado como ".$_SESSION["username"];
 		}
 	}
 ?>
@@ -16,6 +17,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="/safebox/web/css/style.css">
+		<link rel="icon" type="image/png" href="/safebox/web/resources/favicon.png">
 		<script src="/safebox/web/js/funciones.js"></script>
 		<script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
 		<link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
@@ -65,11 +67,16 @@
 
 		<center>
 			<div class="filalinks"> 
-				<a href="?orden=login" class="botonlink"><?= isset($_SESSION["nombre"])?$_SESSION["nombre"]:'Login' ?></a> | 
+				<a href="?orden=login" class="botonlink">
+				<?= isset($_SESSION["nombre"])?$_SESSION["nombre"]:'Login' ?>
+				</a> | 
 				<?= isset($_SESSION["cierresesion"])?$_SESSION["cierresesion"]:'<a href="?orden=registrar" class="botonlink">Registrar</a>' ?> | 
-				<a href="" class="botonlink">Informacion</a>  | 
-				<a href="#" class="botonlink" id="changeTheme">Modo oscuro</a>
+				<a href="?orden=info" class="botonlink">Informacion</a> 
 			</div>
+		</center>
+
+		<center>
+			<div class="loginstatus"> <?= isset($_SESSION["loginstatus"])?$_SESSION["loginstatus"]:'' ?></div>
 		</center>
 
 	</body>

@@ -2,6 +2,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="/safebox/web/css/stylelog.css">
+        <link rel="icon" type="image/png" href="/safebox/web/resources/favicon.png">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=0.6">
         <script src="/safebox/web/js/funciones.js"></script>

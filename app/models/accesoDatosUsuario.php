@@ -214,6 +214,16 @@ class AccesoDatos {
         return $resu;
     }
 
+    function modToken ($id, $newtoken) {
+        $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET token = ? WHERE id = ?");
+        if ( $stmt_moduser == false) die ($this->dbh->error);
+
+        $stmt_moduser->bind_param("si", $newtoken, $id);
+        $stmt_moduser->execute();
+        $resu = ($this->dbh->affected_rows  == 1);
+        return $resu;
+    }
+
     function modPwd ($id, $pwd) {
         $stmt_moduser   = $this->dbh->prepare("UPDATE usuarios SET pwd = ? WHERE id = ?");
         if ( $stmt_moduser == false) die ($this->dbh->error);

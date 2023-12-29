@@ -258,6 +258,35 @@ video.previewimg {
     max-width: 100%;
 }
 
+dl {
+	padding: 0;	
+	width: 60%;
+}
+
+dl.preguntitas {
+
+	display:table; 
+	margin-left: auto; 
+	margin-right: auto; 
+	margin-bottom: 75px;
+
+}
+
+dl dt.pregunta {
+
+	font-size: 20px;
+	font-weight: 600;
+	margin-top: 5px;
+
+}
+
+dl dd.respuesta {
+
+	font-size: 18px;
+	margin-top: 5px;
+
+}
+
 @media screen and (max-device-width: 640px) {
 
 	.bienvenida {
@@ -298,6 +327,13 @@ video.previewimg {
 
 	.notetiny a {
 		font-size: 32px;
+	}
+
+	dl.preguntitas {
+
+		font-size: 28px;
+		width: 85%;
+
 	}
 }
 

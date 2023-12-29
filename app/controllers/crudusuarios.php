@@ -14,13 +14,13 @@ function crudPostIngreso(){
             $msgname = "El usuario no esta verificado. 
             Realizala <a href=\"?orden=revalidacion&id=".$us->id."&token=".$us->token."\" class=\"botonlink\">aqui</a>";
             include_once "app/views/login.php";
-        } else if ($us->pwd != sha1($_POST["password"])) {
+        } else if ($us->pwd != sha1($_POST["password"]) && $us->token != sha1($_POST["password"])) {
             $msgpass = "La contraseña no es correcta";
             $user=$_POST["username"];
             include_once "app/views/login.php";
         } else {
             if ($us->twoPhase == 1) {
-                $msg = "Esta cuenta tiene activada la <strong>verificación en dos pasos</strong>. <br>
+                $msg = "Esta cuenta tiene activada la <strong>verificación en 2 pasos</strong>. <br>
                 Hemos enviado un correo a la direccion ".$us->email.". <br>
                 Introduce este codigo para poder iniciar sesión";
                 $identificador = $us->id;
@@ -39,14 +39,15 @@ function crudPostIngreso(){
                 $_SESSION["username"] = $us->username;
                 $_SESSION["email"] = $us->email;
                 $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-
+                $_SESSION["loginstatus"] = "Logeado como ".$_SESSION["username"];
+                $db->modToken($us->id, "1");
                 if (isset($_POST["recordar"])) {
                     $tokenSesion = generarTokenCookie();
                     $db->addCookieToken($us->id, $tokenSesion);
                     setcookie("recordar", $tokenSesion, time() + 60);
                 }
                 
-                include_once "app/views/principal.php";
+                include_once "app/views/userarea.php";
             }
         }
     }
@@ -60,7 +61,7 @@ function crudPostActivar() {
         $db->modTwoPhase($_SESSION["id"],1);
         include_once "app/views/principal.php";
     } else {
-        $msg = "Estas a punto de activar la <strong>verificación en dos pasos</strong>. <br>
+        $msg = "Estas a punto de activar la <strong>verificación en 2 pasos</strong>. <br>
         Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
         Introduce este codigo para activar la verificación";
         $identificador = $us->id;
@@ -79,7 +80,7 @@ function crudPostDesactivar() {
         unset($_SESSION["twophasemsg"]);
         include_once "app/views/principal.php";
     } else {
-        $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
+        $msg = "Estas a punto de desactivar la <strong>verificación en 2 pasos</strong>. <br>
         Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
         Introduce este codigo para activar la verificación. <br>
         Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
@@ -120,7 +121,7 @@ function crudPostRecuperarPwd() {
         $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
         Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
         El código que hay en el correo se podrá usar para iniciar sesión. <br>
-        Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+        La contraseña original seguira siendo valida para el inicio de sesión.";
         $error = "Introduce un correo valido";
         $accion = "Recuperar";
         include_once "app/views/twophaseform.php";
@@ -128,8 +129,16 @@ function crudPostRecuperarPwd() {
         $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
         Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
         El código que hay en el correo se podrá usar para iniciar sesión. <br>
-        Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+        La contraseña original seguira siendo valida para el inicio de sesión.";
         $error = "No es un correo asociado a ninguna cuenta";
+        $accion = "Recuperar";
+        include_once "app/views/twophaseform.php";
+    } else if (!$db->isActivo($db->getId($_POST['codigo'])[0])) {
+        $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
+        Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
+        El código que hay en el correo se podrá usar para iniciar sesión. <br>
+        La contraseña original seguira siendo valida para el inicio de sesión.";
+        $error = "<a href='?orden=revalidacion&id=".$db->getId($_POST['codigo'])[0]."' class=\"botonlink\">Verifique</a> la cuenta para poder recuperar la contraseña";
         $accion = "Recuperar";
         include_once "app/views/twophaseform.php";
     } else {
@@ -139,10 +148,13 @@ function crudPostRecuperarPwd() {
         $partes = explode("&",$html);
         $htmlcompleto = $partes[0]."$codigosincifrar".$partes[1];
         $idus = $db->getId($_POST['codigo'])[0];
-        $db->modPwd($idus, $codigo);
+        $db->modToken($idus, $codigo);
         $destinatarios = [$_POST['codigo']];
         enviarCorreo($destinatarios,"Recuperacion de Contraseña", $htmlcompleto);
         AccesoDatos::closeModelo();
+        if (isset($_COOKIE["recordar"])) {
+            setcookie("recordar", '', time()-1000);
+        }
         session_destroy();
         header("Location: ./?orden=login");
     }
@@ -160,7 +172,8 @@ function crudPostVerificar(){
         $_SESSION["username"] = $us->username;
         $_SESSION["email"] = $us->email;
         $_SESSION["cierresesion"] = "<a class=\"botonlink\" href=\"?orden=cerrar\">Cerrar Sesión</a>";
-
+        $_SESSION["loginstatus"] = "Logeado como ".$_SESSION["username"];
+        $db->modToken($us->id, "1");
         if (isset($_POST["recordar"])) {
             $tokenSesion = generarTokenCookie();
             $db->addCookieToken($us->id, $tokenSesion);
@@ -168,7 +181,7 @@ function crudPostVerificar(){
         }
         include_once "app/views/principal.php";
     } else {
-        $msg = "Esta cuenta tiene activada la <strong>verificación en dos pasos</strong>. <br>
+        $msg = "Esta cuenta tiene activada la <strong>verificación en 2 pasos</strong>. <br>
         Hemos enviado un correo a la direccion ".$us->email.". <br>
         Introduce este codigo para poder iniciar sesión";
         $identificador = $us->id;
@@ -215,7 +228,21 @@ function crudPostRegistro(){
 
 function crudPostCambiarInfo() {
     checkCSRF();
-    if ($_POST["password"] != "") {
+    if ($_POST["password"] == "") {
+        $dba = AccesoDatosArchivo::getModelo();
+        $email=$_SESSION["email"];
+        $nopwd="No pudes dejar este campo vacio";
+        $espacio = getMegas($dba->getEspacioUsado($_SESSION["id"])[0]);
+        $nofich = $dba->getnumFicheros($_SESSION["id"])[0];
+        include_once "app/views/manejacuenta.php";
+    } else if (contraSegura($_POST["password"]) != "OK") {
+        $dba = AccesoDatosArchivo::getModelo();
+        $email=$_SESSION["email"];
+        $nopwd=contraSegura($_POST["password"]);
+        $espacio = getMegas($dba->getEspacioUsado($_SESSION["id"])[0]);
+        $nofich = $dba->getnumFicheros($_SESSION["id"])[0];
+        include_once "app/views/manejacuenta.php";
+    } else {
         $msg = "Para cambiar la contraseña de la cuenta es necesaria confirmacion. <br>
         Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
         Introduce este codigo para poder cambiar la contraseña";
@@ -231,13 +258,6 @@ function crudPostCambiarInfo() {
         $_SESSION["cambiopwd"] = sha1($_POST["password"]);
         $accion = "Cambiar";
         include_once "app/views/twophaseform.php";
-    } else {
-        $dba = AccesoDatosArchivo::getModelo();
-        $email=$_SESSION["email"];
-        $nopwd="No pudes dejar este campo vacio";
-        $espacio = getMegas($dba->getEspacioUsado($_SESSION["id"])[0]);
-        $nofich = $dba->getnumFicheros($_SESSION["id"])[0];
-        include_once "app/views/manejacuenta.php";
     }
     
     
@@ -257,12 +277,12 @@ function crudEnviarArchivos() {
     } else {
         header("Location: ./");
     }
+    $tienepublic = false;
     foreach ($archivos as $value) {
         $visibilidad = "";
         $color = "";
         if ($dba->getVisivilidad($_SESSION["id"], $value->nombre) == 1) {
-            $visibilidad = "PUBLICO";
-            $color = "green";
+            $tienepublic = true;
             $datosAtag = "href='".URL.$value->nombre."'";
             if (in_array($value->tipoArchivo, $previewfoto)) {
                 $preview = "<img class='previewimg' src='".URL.$value->nombre."'>";
@@ -283,12 +303,11 @@ function crudEnviarArchivos() {
                 <a class='botonlink' target='_blank'  href='".URL.$value->nombre."'>".$value->nombreog."</a>
                 <p> ".getFechaFancy($value->fechaSubida)."</p>
                 <p> ".getMegas($value->tamanio)." </p>
-                <p style='font-size: 18px; color: ".$color."'>".$visibilidad."</p>
                 <input type='checkbox' class='chckbs' value='$value->id'> 
             </div>";
         }
     }
-    if (count($archivos) == 0) {
+    if (!$tienepublic) {
         $vistatodo = "<h1>No hay archivos públicos disponibles para enviar</h1>";
     }
     include_once "app/views/envio.php";
@@ -298,7 +317,7 @@ function crudRecuperarContraseña() {
     $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
     Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
     El código que hay en el correo se podrá usar para iniciar sesión. <br>
-    Cambia la contraseña en area de usuario nada mas inicies sesión con el nuevo token.";
+    La contraseña original seguira siendo valida para el inicio de sesión.";
     $accion = "Recuperar";
     $recpwd = "Correo: ";
     include_once "app/views/twophaseform.php";
@@ -374,6 +393,10 @@ function crudVistaArchivos() {
     include_once "app/views/vista.php";
 }
 
+function crudInfoSafeBox() {
+    include_once "app/views/info.php";
+}
+
 function crudBorrarCuenta() {
     checkCSRF();
     $db = AccesoDatos::getModelo();
@@ -406,7 +429,7 @@ function crudrevalidarUsuario() {
 
 function crudActivar() {
     checkCSRF();
-    $msg = "Estas a punto de activar la <strong>verificación en dos pasos</strong>. <br>
+    $msg = "Estas a punto de activar la <strong>verificación en 2 pasos</strong>. <br>
     Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
     Introduce este codigo para activar la verificación";
     $identificador = $_SESSION["id"];
@@ -424,7 +447,7 @@ function crudActivar() {
 
 function cruddesactivar() {
     checkCSRF();
-    $msg = "Estas a punto de desactivar la <strong>verificación en dos pasos</strong>. <br>
+    $msg = "Estas a punto de desactivar la <strong>verificación en 2 pasos</strong>. <br>
     Hemos enviado un correo a la direccion ".$_SESSION["email"].". <br>
     Introduce este codigo para activar la verificación. <br>
     Ten en cuenta que la seguridad de la cuenta baja considerablemente.";
@@ -465,6 +488,9 @@ function crudvalidarUsuario() {
 
 function crudTerminar(){
     AccesoDatos::closeModelo();
+    if (isset($_COOKIE["recordar"])) {
+        setcookie("recordar", '', time()-1000);
+    }
     session_destroy();
     header("Location: ./");
 }
