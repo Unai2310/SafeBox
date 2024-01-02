@@ -102,7 +102,7 @@ class AccesoDatosArchivo {
         return $visi[0];
     }
 
-    public function getArchivosOldest($usuario) {
+    public function getArchivosNewest($usuario) {
         $archivos = [];
         $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5 DESC");
         if ( $stmt_archivo == false) die ($this->dbh->error);
@@ -118,7 +118,24 @@ class AccesoDatosArchivo {
         return $archivos;
     }
 
-    public function getArchivosNewest($usuario) {
+    public function getPropietario($nombrearchivo) {
+        $propietario = "";
+
+        $stmt_archivo = $this->dbh->prepare("SELECT usuario FROM archivos where nombre = ?");
+        if ( $stmt_archivo == false) die ($this->dbh->error);
+        
+        $stmt_archivo->bind_param("s",$nombrearchivo);
+        $stmt_archivo->execute();
+        $result = $stmt_archivo->get_result();
+
+        if ( $result ){
+            $propietario = $result->fetch_row();
+        }
+
+        return $propietario;
+    }
+
+    public function getArchivosOldest($usuario) {
         $archivos = [];
         $stmt_archivo  = $this->dbh->prepare("SELECT * FROM archivos WHERE usuario = ? order by 5");
         if ( $stmt_archivo == false) die ($this->dbh->error);

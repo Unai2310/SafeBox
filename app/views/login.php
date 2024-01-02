@@ -26,9 +26,8 @@
 		<form class="genericform" action="/safebox/" method="POST" autocomplete="off">
 			Usuario: 
 			<br> 
-			<input class="stylized" type="text" name="username" value="<?= isset($user)?$user:'' ?>" required=""> 
+			<input class="stylized" type="text" name="username" required=""> 
 			<br> 
-			<?= isset($msgname)?$msgname:'' ?>
 			<br>
 			<br>
 			Contraseña: 

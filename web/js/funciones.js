@@ -255,7 +255,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     spanbueno.addEventListener("click", function() {
                         let copiar = this.textContent;
                         navigator.clipboard.writeText("https://flo.no-ip.info/uploads/"+copiar);
-                        //navigator.clipboard.writeText("http://localhost/uploads/"+copiar);
                     });
                 } else {
                     alert(obj.error);

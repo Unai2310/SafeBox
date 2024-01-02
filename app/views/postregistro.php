@@ -27,7 +27,7 @@
 			<div style="font-size: 20px; font-family: 'Helvetica';">
                 Muchas gracias por unirte a <strong>Safebox</strong>. <br>
                 Solo te queda verificar la direccion de correo electronico para poder activar tu cuenta. <br>
-                Hemos enviado a <?= isset($eml)?$eml:'' ?> un correo con la activación de la cuenta. <br>
+                <?= isset($eml)?$eml:'' ?>  <br>
                 Completalo para poder <a href="?orden=login" class="botonlink">Iniciar Sesión</a>.
 			</div>
 		</form>

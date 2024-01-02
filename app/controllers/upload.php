@@ -37,7 +37,6 @@ if (count($_POST) == 0 ) {
     if ($fecha["minutes"] < 10) {
         $fecha["minutes"] = "0"+$fecha["minutes"];
     }
-    $minbien = 
     $fechaString=$fecha["mday"].",".$fecha["mon"].",".$fecha["year"].",".$fecha["hours"].",".$fecha["minutes"];
 
     $respuesta["nombre"] = $file['name'];

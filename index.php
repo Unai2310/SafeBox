@@ -35,6 +35,7 @@ if (isset($_GET["orden"])) {
         case "Activar"              : crudPostActivar(); break;
         case "Desactivar"           : crudPostDesactivar(); break;
         case "Cambiar Contraseña"   : crudPostCambiarInfo(); break;
+        case "Restablecer"          : crudPostRestablecerPwd(); break;
         case "Cambiar"              : crudPostCambiarPwd(); break; 
         case "Recuperar"            : crudPostRecuperarPwd(); break;
     }

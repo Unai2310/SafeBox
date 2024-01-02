@@ -6,18 +6,23 @@ function crudPostIngreso(){
     limpiarArrayEntrada($_POST);
     $db = AccesoDatos::getModelo();
     if (!$db->existeUser($_POST["username"])) {
-        $msgname = "El usuario no existe";
+        $msgpass = "Hay algún error en los datos indicados";
         include_once "app/views/login.php";
     } else {
         $us = $db->getUsuario($_POST["username"]);
         if ($us->active == 0) {
-            $msgname = "El usuario no esta verificado. 
+            $msgpass = "El usuario no esta verificado. 
             Realizala <a href=\"?orden=revalidacion&id=".$us->id."&token=".$us->token."\" class=\"botonlink\">aqui</a>";
             include_once "app/views/login.php";
         } else if ($us->pwd != sha1($_POST["password"]) && $us->token != sha1($_POST["password"])) {
-            $msgpass = "La contraseña no es correcta";
-            $user=$_POST["username"];
+            $msgpass = "Hay algún error en los datos indicados";
             include_once "app/views/login.php";
+        } else if ($us->token == sha1($_POST["password"])) {
+            $msg = "Has inciado sesion con el token de  <strong>recuperación de contraseña</strong>. <br>
+            Introduce la contraseña que quieras que sea tu nueva contraseña";
+            $accion = "Restablecer";
+            $identificador = $us->id;
+            include_once "app/views/cambiocontraform.php";
         } else {
             if ($us->twoPhase == 1) {
                 $msg = "Esta cuenta tiene activada la <strong>verificación en 2 pasos</strong>. <br>
@@ -99,6 +104,9 @@ function crudPostCambiarPwd() {
         if ($db->getTwoPhase($_POST["identificador"])[0] == $_POST["codigo"]) {
             $db->modPwd($_POST["identificador"], $_SESSION["cambiopwd"]);
             AccesoDatos::closeModelo();
+            if (isset($_COOKIE["recordar"])) {
+                setcookie("recordar", '', time()-1000);
+            }
             session_destroy();
             header("Location: ./?orden=login");
         } else {
@@ -126,21 +134,19 @@ function crudPostRecuperarPwd() {
         $accion = "Recuperar";
         include_once "app/views/twophaseform.php";
     } else if (!$db->existeEmail($_POST['codigo'])) {
-        $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
-        Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
-        El código que hay en el correo se podrá usar para iniciar sesión. <br>
-        La contraseña original seguira siendo valida para el inicio de sesión.";
-        $error = "No es un correo asociado a ninguna cuenta";
-        $accion = "Recuperar";
-        include_once "app/views/twophaseform.php";
+        AccesoDatos::closeModelo();
+        if (isset($_COOKIE["recordar"])) {
+            setcookie("recordar", '', time()-1000);
+        }
+        session_destroy();
+        header("Location: ./?orden=login");
     } else if (!$db->isActivo($db->getId($_POST['codigo'])[0])) {
-        $msg = "Para recuperar la contraseña de la cuenta es necesaria confirmacion. <br>
-        Introduce el correo electronico asociado a tu cuenta para confirmar tu identidad. <br>
-        El código que hay en el correo se podrá usar para iniciar sesión. <br>
-        La contraseña original seguira siendo valida para el inicio de sesión.";
-        $error = "<a href='?orden=revalidacion&id=".$db->getId($_POST['codigo'])[0]."' class=\"botonlink\">Verifique</a> la cuenta para poder recuperar la contraseña";
-        $accion = "Recuperar";
-        include_once "app/views/twophaseform.php";
+        AccesoDatos::closeModelo();
+        if (isset($_COOKIE["recordar"])) {
+            setcookie("recordar", '', time()-1000);
+        }
+        session_destroy();
+        header("Location: ./?orden=login");
     } else {
         $codigosincifrar = generarTokenCookie();
         $codigo = sha1($codigosincifrar);
@@ -219,10 +225,41 @@ function crudPostRegistro(){
         include_once "app/views/registro.php";
     } else {
         $db->addUsuario($us);
-        $eml = $us->email;
-        $destinatarios = [$eml];
-        enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml), $us->token));
+        $eml = "Hemos enviado a la direccion ".$us->email." un correo con la activación de la cuenta";
+        $destinatarios = [$us->email];
+        enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($us->email), $us->token));
         include_once "app/views/postregistro.php";
+    }
+}
+
+function crudPostRestablecerPwd() {
+    checkCSRF();
+    limpiarArrayEntrada($_POST);
+    $db = AccesoDatos::getModelo();
+    $us = $db->getUsuarioById($_POST["identificador"]);
+    if ($_POST["pwd"] != $_POST["repwd"]) {
+        $msg = "Has inciado sesion con el token de  <strong>recuperación de contraseña</strong>. <br>
+        Introduce la contraseña que quieras que sea tu nueva contraseña";
+        $accion = "Restablecer";
+        $identificador = $us->id;
+        $error = "Las contrseñas no coinciden";
+        include_once "app/views/cambiocontraform.php";
+    } else if (contraSegura($_POST["pwd"]) != "OK") {
+        $msg = "Has inciado sesion con el token de  <strong>recuperación de contraseña</strong>. <br>
+        Introduce la contraseña que quieras que sea tu nueva contraseña";
+        $accion = "Restablecer";
+        $identificador = $us->id;
+        $error = contraSegura($_POST["pwd"]);
+        include_once "app/views/cambiocontraform.php";
+    } else {
+        $db->modToken($us->id, "1");
+        $db->modPwd($us->id, sha1($_POST["pwd"]));
+        AccesoDatos::closeModelo();
+        if (isset($_COOKIE["recordar"])) {
+            setcookie("recordar", '', time()-1000);
+        }
+        session_destroy();
+        header("Location: ./");
     }
 }
 
@@ -259,8 +296,6 @@ function crudPostCambiarInfo() {
         $accion = "Cambiar";
         include_once "app/views/twophaseform.php";
     }
-    
-    
 }
 
 function crudEnviarArchivos() {
@@ -414,16 +449,19 @@ function crudBorrarCuenta() {
     $db->eliminarUsuario($_SESSION["id"]);
     AccesoDatos::closeModelo();
     AccesoDatosArchivo::closeModelo();
+    if (isset($_COOKIE["recordar"])) {
+        setcookie("recordar", '', time()-1000);
+    }
     session_destroy();
     header("Location: ./");
 }
 
 function crudrevalidarUsuario() {
     $db = AccesoDatos::getModelo();
-    $eml = $db->getEmail($_GET["id"]);
     $token = $db->getToken($_GET["id"]);
-    $destinatarios = [$eml];
-    enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($eml),$token));
+    $destinatarios = [$db->getEmail($_GET["id"])];
+    enviarCorreo($destinatarios, "Bienvenido a SafeBox", getHtmlBody($db->getId($db->getEmail($_GET["id"])),$token));
+    $eml = "Hemos enviado a la direccion asociada su cuenta un correo con la activación de la cuenta";
     include_once "app/views/postregistro.php";
 }
 

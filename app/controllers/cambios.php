@@ -51,7 +51,7 @@ if ($_POST['file'] > 0) {
             $archivo = $db->getArchivo($value);
             $codigo .= " <p><a href='https://flo.no-ip.info/uploads/".$archivo->nombre."' class='btn'>".$archivo->nombre."</a></p>";
         }
-        
+        unset($value);
         $html = file_get_contents(RUTAHOME."safebox/app/views/bodycorreocompartir.html");
         $partes = explode("&",$html);
         $htmlcompleto = $partes[0]."$codigo".$partes[1];
