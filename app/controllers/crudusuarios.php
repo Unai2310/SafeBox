@@ -242,7 +242,7 @@ function crudPostRestablecerPwd() {
         Introduce la contraseña que quieras que sea tu nueva contraseña";
         $accion = "Restablecer";
         $identificador = $us->id;
-        $error = "Las contrseñas no coinciden";
+        $error = "Las contraseñas no coinciden";
         include_once "app/views/cambiocontraform.php";
     } else if (contraSegura($_POST["pwd"]) != "OK") {
         $msg = "Has inciado sesion con el token de  <strong>recuperación de contraseña</strong>. <br>
